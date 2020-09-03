@@ -5,6 +5,7 @@ using Cosmos.Network;
 using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
+
 namespace AscensionGateServer
 {
     class Program

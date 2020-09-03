@@ -12,7 +12,7 @@ namespace AscensionGateServer
     public class ConsoleLogHelper : ILogHelper
     {
         string logPath;
-        string logFileName="CosmosServerLog.log";
+        string logFileName= "AscensionGateServerLog.log";
         public ConsoleLogHelper()
         {
             if (logPath == null)

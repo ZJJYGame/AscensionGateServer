@@ -109,6 +109,20 @@ namespace Cosmos
             Snd_nxt = SN + 1;
             OperationCode = opCode;
         }
+        public UdpNetMessage(UdpNetMessage udpNetMsg, byte[] message)
+        {
+            if (message == null)
+                Length = 0;
+            else
+                Length = (ushort)message.Length;
+            Conv = udpNetMsg.Conv;
+            SN = udpNetMsg.Conv;
+            Cmd = udpNetMsg.Cmd;
+            ServiceMsg = message;
+            Rcv_nxt = udpNetMsg.SN;
+            Snd_nxt = SN + 1;
+            OperationCode = udpNetMsg.OperationCode;
+        }
         /// <summary>
         /// ACK报文构造
         /// </summary>
