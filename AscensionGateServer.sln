@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30406.217
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AscensionGateServer", "AscensionGateServer\AscensionGateServer.csproj", "{F95DD40A-BA64-46A3-9878-747997F2A687}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosFramework", "CosmosFramework\CosmosFramework.csproj", "{8C608885-7D26-4516-A20F-2DADA34152ED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F95DD40A-BA64-46A3-9878-747997F2A687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95DD40A-BA64-46A3-9878-747997F2A687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95DD40A-BA64-46A3-9878-747997F2A687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95DD40A-BA64-46A3-9878-747997F2A687}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C608885-7D26-4516-A20F-2DADA34152ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C608885-7D26-4516-A20F-2DADA34152ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C608885-7D26-4516-A20F-2DADA34152ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C608885-7D26-4516-A20F-2DADA34152ED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F12FEA1D-4D53-4021-8BF4-79F39B723C9D}
+	EndGlobalSection
+EndGlobal
