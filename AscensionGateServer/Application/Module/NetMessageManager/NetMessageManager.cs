@@ -27,7 +27,7 @@ namespace AscensionGateServer
             if (verified)
             {
                 MessagePacket mp = new MessagePacket();
-                mp.OperationCode = (byte)GateOperationCode._LoginVerify;
+                mp.OperationCode = Convert.ToByte(GateOperationCode._LoginVerify);
                 Dictionary<byte, object> dataDict = new Dictionary<byte, object>();
                 dataDict.Add(Convert.ToByte(GateParameterCode.Token), Encryption.Token(plaintext));
                 mp.SetParameters(dataDict);
@@ -39,7 +39,7 @@ namespace AscensionGateServer
             else
             {
                 MessagePacket mp = new MessagePacket();
-                mp.OperationCode = (byte)GateOperationCode._LoginVerify;
+                mp.OperationCode = Convert.ToByte(GateOperationCode._LoginVerify);
                 mp.ReturnCode = Convert.ToInt16(GateReturnCode.Fail);
                 UdpNetMessage udpNetMsg = netMsg as UdpNetMessage;
                 var encodedMsg = await EncodeMessage(udpNetMsg, mp);
