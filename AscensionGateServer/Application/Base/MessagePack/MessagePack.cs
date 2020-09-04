@@ -28,7 +28,7 @@ namespace AscensionGateServer
         public Dictionary<byte, object> Parameters { get; set; }
         public short ReturnCode { get; set; }
         object dataContract;
-        static IMessagePackSerializeProvider serializationProvider;
+        static IMessagePackSerializeHelper serializationHelper;
         public MessagePacket() { }
         public MessagePacket(byte operationCode)
         {
@@ -50,17 +50,17 @@ namespace AscensionGateServer
         {
             this.Parameters = parameters;
         }
-        public static void SetProvider(IMessagePackSerializeProvider provider)
+        public static void SetHelper(IMessagePackSerializeHelper helper)
         {
-            serializationProvider = provider;
+            serializationHelper = helper;
         }
         public static byte[] Serialize(MessagePacket msgPack)
         {
-            return serializationProvider.Serialize(msgPack);
+            return serializationHelper.Serialize(msgPack);
         }
         public static MessagePacket Deserialize(byte[] data)
         {
-            return serializationProvider.Deserialize(data);
+            return serializationHelper.Deserialize(data);
         }
     }
 }

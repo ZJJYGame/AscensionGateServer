@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AscensionGateServer
 {
-    public class MessagePackJsonProvider : IMessagePackSerializeProvider
+    public class MessagePackJsonHelper : IMessagePackSerializeHelper
     {
         public MessagePacket Deserialize(byte[] data)
         {

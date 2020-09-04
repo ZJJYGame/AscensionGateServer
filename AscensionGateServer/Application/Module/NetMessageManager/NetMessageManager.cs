@@ -11,7 +11,7 @@ namespace AscensionGateServer
         public override void OnInitialization()
         {
             NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._LoginVerify, UserHandler);
-            MessagePacket.SetProvider(new MessagePackJsonProvider());
+            MessagePacket.SetHelper(new MessagePackJsonHelper());
         }
         /// <summary>
         /// 若验证成功，则返回token，若失败，则返回ReturnCode false
