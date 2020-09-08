@@ -5,11 +5,10 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Cosmos;
-using Cosmos.Log;
 
 namespace AscensionGateServer
 {
-    public class ConsoleLogHelper : ILogHelper
+    public class ConsoleLogHelper : ILoggerHelper
     {
         string logPath;
         string logFileName= "AscensionGateServerLog.log";
