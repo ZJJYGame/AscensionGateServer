@@ -29,7 +29,7 @@ namespace AscensionGateServer
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             Console.ForegroundColor = color;
-            Console.WriteLine($"LogInfo : { msg}");
+            Console.WriteLine($"INFO: { msg}");
             Utility.Logger.Info(msg.ToString());
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
@@ -39,7 +39,7 @@ namespace AscensionGateServer
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"LogWarring : { msg}");
+            Console.WriteLine($"WARN : { msg}");
             Utility.Logger.Warring(msg.ToString());
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
@@ -49,7 +49,7 @@ namespace AscensionGateServer
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"LogError : { msg}");
+            Console.WriteLine($"ERROR : { msg}");
             Utility.Logger.Error(null, msg.ToString());
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
@@ -62,11 +62,10 @@ namespace AscensionGateServer
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"LogFatal : { msg}");
+            Console.WriteLine($"FATAL : { msg}");
             Utility.Logger.Warring(msg.ToString());
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
         }
-
     }
 }
