@@ -104,8 +104,6 @@ namespace Cosmos
                 {
                     UdpNetMessage netMsg = GameManager.ReferencePoolManager.Spawn<UdpNetMessage>();
                     netMsg.CacheDecodeBuffer(data.Buffer);
-                    if (netMsg.Cmd == KcpProtocol.MSG)
-                        Utility.Debug.LogInfo($" OnRefresh KCP_MSG：{netMsg} ;ServiceMessage : {Utility.Converter.GetString(netMsg.ServiceMsg)},TS:{netMsg.TS}");
                     if (netMsg.IsFull)
                     {
                         if (netMsg.Conv == 0)

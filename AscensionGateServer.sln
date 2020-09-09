@@ -7,24 +7,30 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AscensionGateServer", "Asce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosFramework", "CosmosFramework\CosmosFramework.csproj", "{8C608885-7D26-4516-A20F-2DADA34152ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protocol", "Protocol\Protocol.csproj", "{264863FF-F9E0-4C37-8098-A28DABB37594}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Protocol", "Protocol\Protocol.csproj", "{264863FF-F9E0-4C37-8098-A28DABB37594}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Publish|Any CPU = Publish|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F95DD40A-BA64-46A3-9878-747997F2A687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F95DD40A-BA64-46A3-9878-747997F2A687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95DD40A-BA64-46A3-9878-747997F2A687}.Publish|Any CPU.ActiveCfg = Release|Any CPU
 		{F95DD40A-BA64-46A3-9878-747997F2A687}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F95DD40A-BA64-46A3-9878-747997F2A687}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C608885-7D26-4516-A20F-2DADA34152ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C608885-7D26-4516-A20F-2DADA34152ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C608885-7D26-4516-A20F-2DADA34152ED}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{8C608885-7D26-4516-A20F-2DADA34152ED}.Publish|Any CPU.Build.0 = Release|Any CPU
 		{8C608885-7D26-4516-A20F-2DADA34152ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C608885-7D26-4516-A20F-2DADA34152ED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{264863FF-F9E0-4C37-8098-A28DABB37594}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{264863FF-F9E0-4C37-8098-A28DABB37594}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{264863FF-F9E0-4C37-8098-A28DABB37594}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{264863FF-F9E0-4C37-8098-A28DABB37594}.Publish|Any CPU.Build.0 = Release|Any CPU
 		{264863FF-F9E0-4C37-8098-A28DABB37594}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{264863FF-F9E0-4C37-8098-A28DABB37594}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
