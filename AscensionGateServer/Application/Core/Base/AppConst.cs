@@ -9,6 +9,7 @@ namespace AscensionGateServer
     {
         public static readonly string _TokenSecretKey = "ws123456";
         public static readonly string _KcpSecretKey = "JYGameEpoch";
+        public static readonly string _TokenInfo = "TokenInfo";
         static byte[] kcpIV;
         public static byte[] KcpIV
         {

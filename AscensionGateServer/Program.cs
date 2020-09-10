@@ -31,20 +31,18 @@ namespace AscensionGateServer
             Utility.Json.SetHelper(new NewtonjsonHelper());
             Utility.Debug.LogInfo("Server Start Running !");
             GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
-            GameManager.External.GetModule<JWTManager>().SetHelper(new GateTokenHelper());
-
-            User userObj = new User() { Account = "ws123456", Password = "jieyougame", UUID = "ABCD" };
-            var userJson = Utility.Json.ToJson(userObj);
-            var token = GameManager.External.GetModule<JWTManager>().EncodeToken("User","jieyou");
-            Utility.Debug.LogInfo(token);
-            var deToken = GameManager.External.GetModule<JWTManager>().DecodeToken(token);
-            //List<string> str = Utility.Json.ToObject<List<string>>(deToken);
-            List<string> str = new List<string>() { "ws", "jck" };
-            Utility.Debug.LogInfo(deToken);
-            //Utility.Debug.LogInfo(str);
-            Utility.Debug.LogInfo(Utility.Json.ToJson(str));
             Task.Run(GameManagerAgent.Instance.OnRefresh);
+            AssertCode();
             while (true) { }
+        }
+        static void AssertCode()
+        {
+            GameManager.External.GetModule<JWTManager>().SetHelper(new GateTokenHelper());
+            User userObj = new User() { Account = "ws123456", Password = "jieyougame", UUID = "ABCD" };
+            var token = GameManager.External.GetModule<JWTManager>().EncodeToken(userObj);
+            Utility.Debug.LogInfo(token);
+            var deToken = GameManager.External.GetModule<JWTManager>().DecodeToken<User>(token);
+            Utility.Debug.LogInfo(deToken.ToString());
         }
     }
 }
