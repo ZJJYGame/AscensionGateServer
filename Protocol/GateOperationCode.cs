@@ -9,6 +9,6 @@ namespace Protocol
     public class GateOperationCode
     {
         public static readonly ushort _LoginVerify = 11;
-        public static readonly ushort _Token= 12;
+        public static readonly ushort _Token= 243;
     }
 }

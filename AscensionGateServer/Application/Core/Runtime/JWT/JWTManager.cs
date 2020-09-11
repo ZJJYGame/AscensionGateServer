@@ -1,10 +1,9 @@
-﻿
-using Cosmos;
+﻿using Cosmos;
 using System.Threading.Tasks;
 
 namespace AscensionGateServer
 {
-    public class JWTManager : Module<JWTManager>
+    public sealed partial class JWTManager : Module<JWTManager>
     {
         IJWTTokenHelper tokenHelper;
         public void SetHelper(IJWTTokenHelper helper)

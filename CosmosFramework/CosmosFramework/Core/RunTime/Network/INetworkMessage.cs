@@ -10,6 +10,8 @@ namespace Cosmos
         long Conv { get; }
         byte[] EncodeMessage();
         bool DecodeMessage(byte[] buffer);
+        byte[] ServiceMsg { get; }
         byte[] GetBuffer();
+
     }
 }

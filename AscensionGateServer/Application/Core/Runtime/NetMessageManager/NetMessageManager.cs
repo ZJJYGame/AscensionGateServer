@@ -19,7 +19,7 @@ namespace AscensionGateServer
         /// <param name="netMsg">派发进来的网络消息体</param>
         async void UserHandler(INetworkMessage netMsg)
         {
-            var plaintext = Encryption.Decrypt(netMsg.GetBuffer());
+            var plaintext = Encryption.Decrypt(netMsg.ServiceMsg);
             User userObj = Utility.Json.ToObject<User>(plaintext);
             NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userObj.Account);
             NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userObj.Password);

@@ -233,6 +233,10 @@ namespace Cosmos
             Buffer = data;
             return data;
         }
+        /// <summary>
+        /// 获取编码后的数据buffer
+        /// </summary>
+        /// <returns>序列化后的buffer</returns>
         public byte[] GetBuffer()
         {
             return EncodeMessage();
