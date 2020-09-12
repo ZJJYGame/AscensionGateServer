@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AscensionGateServer
 {
-    public class MessagePackJsonHelper : IMessagePackSerializeHelper
+    public class MessagePacketJsonHelper : IMessagePacketSerializeHelper
     {
         public MessagePacket Deserialize(byte[] data)
         {
@@ -21,7 +21,7 @@ namespace AscensionGateServer
                     try
                     {
                         string json = reader.ReadString();
-                        mp.Parameters = Utility.Json.ToObject<Dictionary<byte, object>>(json);
+                        mp.Messages = Utility.Json.ToObject<Dictionary<byte, object>>(json);
                     }
                     catch (Exception e)
                     {
@@ -40,9 +40,9 @@ namespace AscensionGateServer
                 {
                     writer.Write(msgPack.OperationCode);
                     writer.Write(msgPack.ReturnCode);
-                    if (msgPack.Parameters != null)
+                    if (msgPack.Messages != null)
                     {
-                        string json = Utility.Json.ToJson(msgPack.Parameters);
+                        string json = Utility.Json.ToJson(msgPack.Messages);
                         writer.Write(json);
                     }
                 }

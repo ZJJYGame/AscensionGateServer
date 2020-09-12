@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AscensionGateServer
 {
-    public interface IMessagePackSerializeHelper
+    public interface IMessagePacketSerializeHelper
     {
         byte[] Serialize(MessagePacket msgPack);
         MessagePacket Deserialize(byte[] data);

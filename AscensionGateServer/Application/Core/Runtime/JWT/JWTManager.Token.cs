@@ -1,29 +1,33 @@
 ﻿using Cosmos;
 using System.Threading.Tasks;
 using Protocol;
+using Ubiety.Dns.Core.Common;
+
 namespace AscensionGateServer
 {
     public sealed partial class JWTManager : Module<JWTManager>
     {
         public override void OnInitialization()
         {
-            NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._Token, TokenHandler);
+            MessagePacketEventCore.Instance.AddEventListener((byte)GateOperationCode._Token, MessagePackHandler);
             Utility.Debug.LogInfo("JWT OnInitialization");
         }
-         void TokenHandler(INetworkMessage netMsg)
+        /// <summary>
+        /// 处理数据包
+        /// </summary>
+        /// <param name="packet">数据包</param>
+        void MessagePackHandler(MessagePacket packet)
         {
-            string str = "锟斤拷666";
-            var data = Utility.Encode.ConvertToByte(str);
-            UdpNetMessage msg = UdpNetMessage.EncodeMessage(netMsg.Conv, GateOperationCode._Token, data);
-            GameManager.NetworkManager.SendNetworkMessage(msg);
+            var data= packet[(byte)GateOperationCode._Token];
         }
-        async Task TokenHandlerAsync(INetworkMessage netMsg)
+        async Task<UdpNetMessage> SendMessageAsync(INetworkMessage netMsg, MessagePacket mp)
         {
-             await Task.Run(() => { 
-
-
-
-             });
+            return await Task.Run<UdpNetMessage>(() =>
+            {
+                var data = MessagePacket.Serialize(mp);
+                UdpNetMessage msg = UdpNetMessage.EncodeMessageAsync(netMsg.Conv, netMsg.OperationCode, data).Result;
+                return msg;
+            });
         }
     }
 }

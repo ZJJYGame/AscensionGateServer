@@ -33,7 +33,7 @@ namespace AscensionGateServer
             Utility.Json.SetHelper(new NewtonjsonHelper());
             Utility.Debug.LogInfo("Server Start Running !");
             GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
-            GameManager.External.GetModule<JWTManager>().SetHelper(new GateTokenHelper());
+            GameManager.External.GetModule<JWTManager>().SetHelper(new GateEncodeHelper());
             Task.Run(GameManagerAgent.Instance.OnRefresh);
             AssertCode();
             while (true) { }

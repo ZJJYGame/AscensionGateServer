@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AscensionGateServer
 {
-    public interface IJWTTokenHelper
+    public interface IJWTEncodeHelper
     {
         /// <summary>
         /// 使用默认的key；

@@ -330,5 +330,12 @@ namespace Cosmos
                return EncodeMessage(conv);
            });
         }
+        public static async Task<UdpNetMessage> EncodeMessageAsync(long conv, ushort opCode, byte[] message)
+        {
+            return await Task.Run<UdpNetMessage>(() =>
+            {
+                return EncodeMessage(conv,opCode,message);
+            });
+        }
     }
 }

@@ -7,10 +7,22 @@ namespace AscensionGateServer
 {
     public class AppConst
     {
+        /// <summary>
+        /// token的8位密钥
+        /// </summary>
         public static readonly string _TokenSecretKey = "ws123456";
+        /// <summary>
+        /// kcp通讯的密钥
+        /// </summary>
         public static readonly string _KcpSecretKey = "JYGameEpoch";
-        public static readonly string _TokenInfo = "TokenInfo";
+        /// <summary>
+        /// JWT的token key；
+        /// </summary>
+        public static readonly string _JWTTokenKey = "TokenInfo";
         static byte[] kcpIV;
+        /// <summary>
+        /// kcp初始向量
+        /// </summary>
         public static byte[] KcpIV
         {
             get

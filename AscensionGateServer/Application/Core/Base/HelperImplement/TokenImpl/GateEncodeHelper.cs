@@ -9,7 +9,7 @@ using System.Web;
 using Cosmos;
 namespace AscensionGateServer
 {
-    public class GateTokenHelper : IJWTTokenHelper
+    public class GateEncodeHelper : IJWTEncodeHelper
     {
         readonly string _SecretKey = "292C08109FD07280B3E4B6AAF35C89A0";
         /// <summary>
@@ -20,7 +20,7 @@ namespace AscensionGateServer
         /// <returns>token</returns>
         public string EncodeToken(object value)
         {
-            return EncodeToken(value, AppConst._TokenInfo);
+            return EncodeToken(value, AppConst._JWTTokenKey);
         }
         /// <summary>
         /// 使用数据对象生成token；
@@ -45,7 +45,7 @@ namespace AscensionGateServer
         /// <returns>序列化的数据</returns>
         public string DecodeToken(string token)
         {
-            return DecodeToken(token, AppConst._TokenInfo);
+            return DecodeToken(token, AppConst._JWTTokenKey);
         }
         /// <summary>
         /// 解码token
@@ -82,7 +82,7 @@ namespace AscensionGateServer
         /// <returns>反序列化后的数据对象</returns>
         public T DecodeToken<T>(string token)
         {
-            return DecodeToken<T>(token, AppConst._TokenInfo);
+            return DecodeToken<T>(token, AppConst._JWTTokenKey);
         }
         /// <summary>
         /// 解码token

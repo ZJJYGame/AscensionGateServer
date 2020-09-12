@@ -59,20 +59,38 @@ namespace ProtocolCore
         }
         public void Info(string msg)
         {
+#if DEBUG
             StackTrace st = new StackTrace(new StackFrame(4, true));
             string str = $"{DateTime.Now.ToString()}[ - ] > INFO : {msg};\nStackTrace[ - ] ：{st}";
+#else
+            StackTrace st = new StackTrace(new StackFrame(2, true));
+            StackTrace st0 = new StackTrace(new StackFrame(3, true));
+            string str = $"{DateTime.Now.ToString()}[ - ] > INFO : {msg};\nStackTrace[ - ] ：\n {st}{st0}";
+#endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
         public void Warring(string msg)
         {
+#if DEBUG
             StackTrace st = new StackTrace(new StackFrame(4, true));
             string str = $"{DateTime.Now.ToString()}[ - ] > WARN : {msg};\nStackTrace[ - ] ：{st}";
+#else
+            StackTrace st = new StackTrace(new StackFrame(2, true));
+            StackTrace st0 = new StackTrace(new StackFrame(3, true));
+            string str = $"{DateTime.Now.ToString()}[ - ] > WARN : {msg};\nStackTrace[ - ] ：\n {st}{st0}";
+#endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
         public void Fatal(string msg)
         {
+#if DEBUG
             StackTrace st = new StackTrace(new StackFrame(4, true));
             string str = $"{DateTime.Now.ToString()}[ - ] > FATAL : {msg};\nStackTrace[ - ] ：{st}";
+#else
+            StackTrace st = new StackTrace(new StackFrame(2, true));
+            StackTrace st0 = new StackTrace(new StackFrame(3, true));
+            string str = $"{DateTime.Now.ToString()}[ - ] > FATAL : {msg};\nStackTrace[ - ] ：\n {st}{st0}";
+#endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
         /// <summary>

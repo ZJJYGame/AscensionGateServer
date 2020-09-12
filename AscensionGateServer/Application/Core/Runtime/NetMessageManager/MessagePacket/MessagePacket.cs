@@ -10,25 +10,25 @@ namespace AscensionGateServer
     /// </summary>
     public class MessagePacket
     {
-        public object this[byte parameterKey]
+        public object this[byte messageKey]
         {
             get
             {
                 object varlue;
-                Parameters.TryGetValue(parameterKey, out varlue);
+                Messages.TryGetValue(messageKey, out varlue);
                 return varlue;
             }
             set
             {
-                Parameters.TryAdd(parameterKey, value);
+                Messages.TryAdd(messageKey, value);
             }
         }
         public string DebugMessage { get; set; }
         public byte OperationCode { get; set; }
-        public Dictionary<byte, object> Parameters { get; set; }
+        public Dictionary<byte, object> Messages { get; set; }
         public short ReturnCode { get; set; }
         object dataContract;
-        static IMessagePackSerializeHelper serializationHelper;
+        static IMessagePacketSerializeHelper serializationHelper;
         public MessagePacket() { }
         public MessagePacket(byte operationCode)
         {
@@ -38,19 +38,19 @@ namespace AscensionGateServer
         {
             this.dataContract = dataContract;
         }
-        public MessagePacket(byte operationCode, Dictionary<byte, object> parameters) : this(operationCode)
+        public MessagePacket(byte operationCode, Dictionary<byte, object> messages) : this(operationCode)
         {
-            this.Parameters = parameters;
+            this.Messages = messages;
         }
-        public void SetParameters(object dataContract)
+        public void SetMessages(object dataContract)
         {
             this.dataContract = dataContract;
         }
-        public void SetParameters(Dictionary<byte, object> parameters)
+        public void SetMessages(Dictionary<byte, object> messages)
         {
-            this.Parameters = parameters;
+            this.Messages = messages;
         }
-        public static void SetHelper(IMessagePackSerializeHelper helper)
+        public static void SetHelper(IMessagePacketSerializeHelper helper)
         {
             serializationHelper = helper;
         }

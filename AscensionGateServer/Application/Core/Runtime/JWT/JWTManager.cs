@@ -5,8 +5,8 @@ namespace AscensionGateServer
 {
     public sealed partial class JWTManager : Module<JWTManager>
     {
-        IJWTTokenHelper tokenHelper;
-        public void SetHelper(IJWTTokenHelper helper)
+        IJWTEncodeHelper tokenHelper;
+        public void SetHelper(IJWTEncodeHelper helper)
         {
             this.tokenHelper = helper;
         }
