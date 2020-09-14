@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AscensionGateServer
 {
@@ -61,6 +62,14 @@ namespace AscensionGateServer
         public static MessagePacket Deserialize(byte[] data)
         {
             return serializationHelper.Deserialize(data);
+        }
+        public async static Task<byte[]> SerializeAsync(MessagePacket msgPack)
+        {
+            return await Task.Run(() => { return serializationHelper.Serialize(msgPack); });
+        }
+        public async static Task<MessagePacket> DeserializeAsync(byte[] data)
+        {
+            return await Task.Run(() => { return serializationHelper.Deserialize(data); });
         }
     }
 }

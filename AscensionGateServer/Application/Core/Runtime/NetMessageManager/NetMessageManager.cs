@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmos;
@@ -8,39 +9,99 @@ namespace AscensionGateServer
 {
     //==========================================//
     //消息处理流程：
-    //1、接收到 INetworkMessage 消息后，获取ServiceMsg属性，将
-    // buffer转换对称解密为明文字段；
-    //
-    //2、反序列化明文字段到具体对象，查询数据库的对象映射表数据。
-    //
-    //3、根据查询结果，生成MessagePacket（以下简称mp）。mp的
-    //数据实体为字典，根据key-value进行添加。为mp添加数据载荷则
-    //调用mp的SetMessages方法即可。另外需要为mp添加返回码--
-    //ReturnCode；返回码的载荷为成功、失败、异常等。
-    //
-    //4、发送数据到客户端。
-    //  注：
-    //查询结果为真：根据ServiceMsg转换的文明生成token，并
-    //为mp添加载荷；
-    //查询结果为否：不生成token，mp空数据载荷，但持有返回值载荷。
+    //1、消息从4319口进入此管理类，由MessageHandler进行解码；
+    //2、消息解码为MessagePacket对象后，根据opCode派发到具体
+    // 消息处理者。处理者本质为异步；
+    //3、消息处理者完成消息处理后，则返回处理完成的消息；
+    //4、发送处理好的消息；
     //==========================================
 
     public class NetMessageManager : Module<NetMessageManager>
     {
+        INetMessageEncryptHelper netMsgEncryptHelper;
+        Dictionary<ushort, MessagePacketHandler> handlerDict = new Dictionary<ushort, MessagePacketHandler>();
+        public void SetHelper(INetMessageEncryptHelper helper)
+        {
+            netMsgEncryptHelper = helper;
+        }
         public override void OnInitialization()
         {
             MessagePacket.SetHelper(new MessagePacketJsonHelper());
-            NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, Handler);
+            NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, HandleMessage);
+            InitHandler();
+        }
+        /// <summary>
+        /// 初始化消息处理者；
+        /// </summary>
+        void InitHandler()
+        {
+            var handlerType = typeof(MessagePacketHandler);
+            Type[] types = Assembly.GetAssembly(handlerType).GetTypes();
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (handlerType.IsAssignableFrom(types[i]))
+                {
+                    if (types[i].IsClass && !types[i].IsAbstract)
+                    {
+                        var handler = Utility.Assembly.GetTypeInstance(types[i]) as MessagePacketHandler;
+                        handler.OnInitialization();
+                        handlerDict.Add(handler.OpCode, handler);
+                    }
+                }
+            }
         }
         /// <summary>
         ///  处理从系统通讯通道 （_MSG ）接收到的消息，并解包成MessagePack对象；
-        ///  解包完成后，通过MessagePackEventCore广播监听MessagePack.OperationCode的方法；
+        ///  解包完成后，派发消息到具体的消息处理者；
+        ///  处理者完成处理后，对消息进行发送；
         /// </summary>
         /// <param name="netMsg">数据</param>
-        void Handler(INetworkMessage netMsg)
+        void HandleMessage(INetworkMessage netMsg)
         {
-            MessagePacket packet = MessagePacket.Deserialize(netMsg.ServiceMsg);
-            MessagePacketEventCore.Instance.Dispatch(packet.OperationCode, packet);
+            //MessagePacket packet;
+            ////这里是解码成明文后进行反序列化得到packet数据；
+            //var result = netMsgEncryptHelper.Deserialize(netMsg.ServiceMsg, out packet);
+            //if (!result)
+            //    return;
+            //MessagePacketHandler handler;
+            //var exist = handlerDict.TryGetValue(packet.OperationCode, out handler);
+            //if (exist)
+            //{
+            //    var mp = handler.Handle(packet);
+            //    if (mp != null)
+            //        SendMessage(netMsg, mp);
+            //}
+            var t= HandleMessageAsync(netMsg);
+        }
+        async Task HandleMessageAsync(INetworkMessage netMsg)
+        {
+            await Task.Run(() => 
+            {
+                MessagePacket packet;
+                //这里是解码成明文后进行反序列化得到packet数据；
+                var result = netMsgEncryptHelper.Deserialize(netMsg.ServiceMsg, out packet);
+                if (!result)
+                    return;
+                MessagePacketHandler handler;
+                var exist = handlerDict.TryGetValue(packet.OperationCode, out handler);
+                if (exist)
+                {
+                    var mp = handler.Handle(packet);
+                    if (mp != null)
+                        SendMessage(netMsg, mp);
+                }
+            });
+        }
+        void SendMessage(INetworkMessage netMsg, MessagePacket packet)
+        {
+            byte[] packetBuffer;
+            //加密为密文byte[]；
+            var result = netMsgEncryptHelper.Serialize(packet, out packetBuffer);
+            if (result)
+            {
+                UdpNetMessage msg = UdpNetMessage.EncodeMessageAsync(netMsg.Conv, netMsg.OperationCode, packetBuffer).Result;
+                GameManager.NetworkManager.SendNetworkMessage(msg);
+            }
         }
     }
 }

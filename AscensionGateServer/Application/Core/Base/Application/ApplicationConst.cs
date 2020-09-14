@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AscensionGateServer
 {
-    public class AppConst
+    public class ApplicationConst
     {
         /// <summary>
         /// token的8位密钥

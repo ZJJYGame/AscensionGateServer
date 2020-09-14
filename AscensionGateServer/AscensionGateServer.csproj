@@ -26,6 +26,16 @@
   <ItemGroup>
     <ProjectReference Include="..\CosmosFramework\CosmosFramework.csproj" />
     <ProjectReference Include="..\Protocol\Protocol.csproj" />
+    <ProjectReference Include="..\RedisService\RedisService.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ConfigData\GameServerInfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigData\GameServerInfo01.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

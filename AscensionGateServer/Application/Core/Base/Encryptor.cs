@@ -20,7 +20,7 @@ namespace AscensionGateServer
         /// <returns>密文</returns>
         public static string Encrypt(string plaintext)
         {
-            string ciphertex = Utility.Encryption.DESEncrypt(plaintext, AppConst._KcpSecretKey, AppConst.KcpIV);
+            string ciphertex = Utility.Encryption.DESEncrypt(plaintext, ApplicationConst._TokenSecretKey, ApplicationConst.KcpIV);
             return ciphertex;
         }
         /// <summary>
@@ -31,7 +31,7 @@ namespace AscensionGateServer
         /// <returns>二进制buffer</returns>
         public static byte[] Encrypt2Byte(string plaintext)
         {
-            string ciphertex = Utility.Encryption.DESEncrypt(plaintext, AppConst._KcpSecretKey, AppConst.KcpIV);
+            string ciphertex = Utility.Encryption.DESEncrypt(plaintext, ApplicationConst._TokenSecretKey, ApplicationConst.KcpIV);
             return Utility.Encode.ConvertToByte(ciphertex);
         }
         /// <summary>
@@ -42,7 +42,7 @@ namespace AscensionGateServer
         /// <returns>token密文</returns>
         public static string EncryptToken(string plaintext)
         {
-            var tokenStr = Utility.Encryption.HmacSHA256(plaintext, AppConst._TokenSecretKey);
+            var tokenStr = Utility.Encryption.HmacSHA256(plaintext, ApplicationConst._TokenSecretKey);
             return tokenStr;
         }
         /// <summary>
@@ -53,7 +53,7 @@ namespace AscensionGateServer
         /// <returns>token的加密buffer</returns>
         public static byte[] Token2Byte(string plaintext)
         {
-            var tokenStr = Utility.Encryption.HmacSHA256(plaintext, AppConst._TokenSecretKey);
+            var tokenStr = Utility.Encryption.HmacSHA256(plaintext, ApplicationConst._TokenSecretKey);
             return Utility.Encode.ConvertToByte(tokenStr);
         }
         /// <summary>
@@ -65,7 +65,7 @@ namespace AscensionGateServer
         public static string Decrypt(byte[] buffer)
         {
             var ciphertext = Utility.Encode.ConvertToString(buffer);
-            var plaintext = Utility.Encryption.DESDecrypt(ciphertext, AppConst._KcpSecretKey, AppConst.KcpIV);
+            var plaintext = Utility.Encryption.DESDecrypt(ciphertext, ApplicationConst._TokenSecretKey, ApplicationConst.KcpIV);
             return plaintext;
         }
         /// <summary>
@@ -76,7 +76,7 @@ namespace AscensionGateServer
         /// <returns>明文</returns>
         public static string Decrypt(string ciphertext)
         {
-            var plaintext = Utility.Encryption.DESDecrypt(ciphertext, AppConst._KcpSecretKey, AppConst.KcpIV);
+            var plaintext = Utility.Encryption.DESDecrypt(ciphertext, ApplicationConst._TokenSecretKey, ApplicationConst.KcpIV);
             return plaintext;
         }
         #endregion

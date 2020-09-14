@@ -8,7 +8,7 @@
         Empty = 3,
         InvalidOperationParameter = 4,
         InvalidOperation = 5,
-        ItemAlreadyExists,
-        ItemNotFound,
+        ItemAlreadyExists=6,
+        ItemNotFound=7,
     }
 }

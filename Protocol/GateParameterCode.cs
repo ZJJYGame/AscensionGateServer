@@ -6,7 +6,10 @@ namespace Protocol
 {
     public enum GateParameterCode:byte
     {
-        User = 1,
-        Token = 2
+        /// <summary>
+        /// 包含账户信息以及设备号的数据
+        /// </summary>
+        UserInfo = 3,
+        Token = 4
     }
 }

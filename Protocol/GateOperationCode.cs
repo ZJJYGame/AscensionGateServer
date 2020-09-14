@@ -9,7 +9,7 @@ namespace Protocol
     public class GateOperationCode
     {
         #region MessagePack Opcode
-        public static readonly ushort _Login = 1;
+        public static readonly ushort _UserInfo = 1;
         public static readonly ushort _LoginOff =2 ;
         public static readonly ushort _Token= 243;
         #endregion

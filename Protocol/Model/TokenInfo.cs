@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 
 namespace Protocol
 {
-    public class Token:IDisposable
+    public class TokenInfo:IDisposable
     {
-        public virtual string TokenString { get; set; }
+        public long Conv { get; set; }
+        public string Token { get; set; }
         public void Dispose()
         {
-            TokenString = null;
+            Conv = 0;
+            Token = null;
         }
         public override string ToString()
         {
-            return $"Token : {TokenString} ;";
+            return $"TokenString : {Token} ;";
         }
     }
 }

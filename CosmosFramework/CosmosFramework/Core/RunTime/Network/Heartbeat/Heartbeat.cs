@@ -56,7 +56,9 @@ namespace Cosmos
                 UnavailableHandler?.Invoke();
                 return;
             }
+#if DEBUG
             Utility.Debug.LogInfo($"Heartbeat check ：Conv : {Conv} ; currentRecurCount  : {currentRecurCount}");
+#endif
         }
         public void OnRenewal()
         {
