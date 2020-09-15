@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 
 namespace AscensionGateServer
 {
-    public sealed partial class JWTManager : Module<JWTManager>
+    public static partial class JWTEncoder
     {
-        IJWTEncodeHelper tokenHelper;
-        public void SetHelper(IJWTEncodeHelper helper)
+        static IJWTEncodeHelper tokenHelper;
+        static JWTEncoder()
         {
-            this.tokenHelper = helper;
+            var obj = Utility.Assembly.GetInstanceByAttribute<TargetHelperAttribute>(typeof(IJWTEncodeHelper));
+            tokenHelper = obj as IJWTEncodeHelper;
         }
         #region Sync
         /// <summary>
@@ -17,9 +18,9 @@ namespace AscensionGateServer
         /// <param name="value">未序列化的数据对象</param>
         /// <param name="key">自定义的key</param>
         /// <returns>token</returns>
-        public string EncodeToken(object value, string key)
+        public static string EncodeToken(object value, string key)
         {
-            return tokenHelper.EncodeToken( value,key);
+            return tokenHelper.EncodeToken(value, key);
         }
         /// <summary>
         /// 使用默认的key；
@@ -27,9 +28,9 @@ namespace AscensionGateServer
         /// </summary>
         /// <param name="value">未序列化的数据对象</param>
         /// <returns>token</returns>
-        public string EncodeToken(object value)
+        public static string EncodeToken(object value)
         {
-            return tokenHelper.EncodeToken( value);
+            return tokenHelper.EncodeToken(value);
         }
         /// <summary>
         /// 解码token；
@@ -37,7 +38,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <param name="token">token数据</param>
         /// <returns>序列化的数据</returns>
-        public string DecodeToken(string token)
+        public static string DecodeToken(string token)
         {
             return tokenHelper.DecodeToken(token);
         }
@@ -47,9 +48,9 @@ namespace AscensionGateServer
         /// <param name="token">token数据</param>
         /// <param name="key">自定义的key</param>
         /// <returns>序列化的数据</returns>
-        public string DecodeToken(string token,string key)
+        public static string DecodeToken(string token, string key)
         {
-            return tokenHelper.DecodeToken(token,key);
+            return tokenHelper.DecodeToken(token, key);
         }
         /// <summary>
         /// 解码token；
@@ -58,7 +59,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">目标数据类型</typeparam>
         /// <param name="token">token数据</param>
         /// <returns>反序列化后的数据对象</returns>
-        public T DecodeToken<T>(string token)
+        public static T DecodeToken<T>(string token)
         {
             return tokenHelper.DecodeToken<T>(token);
         }
@@ -69,9 +70,9 @@ namespace AscensionGateServer
         /// <param name="token">token数据</param>
         /// <param name="key">自定义的key</param>
         /// <returns>反序列化后的数据对象</returns>
-        public T DecodeToken<T>(string token,string key)
+        public static T DecodeToken<T>(string token, string key)
         {
-            return tokenHelper.DecodeToken<T>(token,key);
+            return tokenHelper.DecodeToken<T>(token, key);
         }
         #endregion
         #region Async
@@ -82,9 +83,9 @@ namespace AscensionGateServer
         /// <param name="value">未序列化的数据对象</param>
         /// <param name="key">自定义的key</param>
         /// <returns>token</returns>
-        public async Task<string> EncodeTokenAsync(object value,string key)
+        public async static Task<string> EncodeTokenAsync(object value, string key)
         {
-            return await Task.Run<string>(() => tokenHelper.EncodeToken(value,key));
+            return await Task.Run<string>(() => tokenHelper.EncodeToken(value, key));
         }
         /// <summary>
         /// 异步；
@@ -93,9 +94,9 @@ namespace AscensionGateServer
         /// </summary>
         /// <param name="value">未序列化的数据对象</param>
         /// <returns>token</returns>
-        public async Task<string> EncodeTokenAsync( object value)
+        public async static Task<string> EncodeTokenAsync(object value)
         {
-            return await Task.Run<string>(() => tokenHelper.EncodeToken( value));
+            return await Task.Run<string>(() => tokenHelper.EncodeToken(value));
         }
         /// <summary>
         /// 异步；
@@ -104,7 +105,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <param name="token">token数据</param>
         /// <returns>序列化的数据</returns>
-        public async Task<string> DecodeTokenAsync(string token)
+        public async static Task<string> DecodeTokenAsync(string token)
         {
             return await Task.Run<string>(() => tokenHelper.DecodeToken(token));
         }
@@ -115,9 +116,9 @@ namespace AscensionGateServer
         /// <param name="token">token数据</param>
         /// <param name="key">自定义的key</param>
         /// <returns>序列化的数据</returns>
-        public async Task<string> DecodeTokenAsync(string token,string key)
+        public async static Task<string> DecodeTokenAsync(string token, string key)
         {
-            return await Task.Run<string>(() => tokenHelper.DecodeToken(token,key));
+            return await Task.Run<string>(() => tokenHelper.DecodeToken(token, key));
         }
         /// <summary>
         /// 异步；
@@ -127,7 +128,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">目标数据类型</typeparam>
         /// <param name="token">token数据</param>
         /// <returns>反序列化后的数据对象</returns>
-        public async Task<T> DecodeTokenAsync<T>(string token)
+        public async static Task<T> DecodeTokenAsync<T>(string token)
         {
             return await Task.Run<T>(() => tokenHelper.DecodeToken<T>(token));
         }
@@ -139,9 +140,9 @@ namespace AscensionGateServer
         /// <param name="token">token数据</param>
         /// <param name="key">自定义的key</param>
         /// <returns>反序列化后的数据对象</returns>
-        public async Task<T> DecodeTokenAsync<T>(string token,string key)
+        public async static Task<T> DecodeTokenAsync<T>(string token, string key)
         {
-            return await Task.Run<T>(() => tokenHelper.DecodeToken<T>(token,key));
+            return await Task.Run<T>(() => tokenHelper.DecodeToken<T>(token, key));
         }
         #endregion
     }

@@ -10,6 +10,7 @@ namespace Protocol
         /// 包含账户信息以及设备号的数据
         /// </summary>
         UserInfo = 3,
-        Token = 4
+        Token = 4,
+        ServerInfo=5
     }
 }

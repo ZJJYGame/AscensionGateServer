@@ -1,0 +1,16 @@
+﻿{
+  "GameServerList": [
+    {
+      "Address": "127.0.0.1",
+      "Port": 5055,
+      "AppName": "AscensionGame",
+      "Index": 0
+    },
+    {
+      "Address": "127.0.0.1",
+      "Port": 5055,
+      "AppName": "AscensionGame",
+      "Index": 1
+    }
+  ]
+}

@@ -9,6 +9,8 @@ using Protocol;
 using System.Collections.Generic;
 using Lidgren.Network;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
+using RedisService;
 
 namespace AscensionGateServer
 {
@@ -33,26 +35,10 @@ namespace AscensionGateServer
             Utility.Json.SetHelper(new NewtonjsonHelper());
             Utility.Debug.LogInfo("Server Start Running !");
             GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
-            GameManager.External.GetModule<JWTManager>().SetHelper(new GateEncodeHelper());
-            GameManager.External.GetModule<NetMessageManager>().SetHelper(new GateNetMsgEncryptHelper());
-            GameManager.External.GetModule<ResourceManager>();
+            GameManager.InitOuterModule(typeof(ApplicationConst));
             Task.Run(GameManagerAgent.Instance.OnRefresh);
-            //AssertCode();
+            RedisManager.Instance.OnInitialization();
             while (true) { }
-        }
-        static void AssertCode()
-        {
-            UserInfo userObj = new UserInfo() { Account = "ws123456", Password = "jieyougame"};
-            var token = GameManager.External.GetModule<JWTManager>().EncodeToken(userObj);
-            Utility.Debug.LogInfo(token);
-            var desEnToken = Utility.Encryption.DESEncrypt(token, ApplicationConst._TokenSecretKey, ApplicationConst.KcpIV);
-            var desDeToken = Utility.Encryption.DESDecrypt(desEnToken ,ApplicationConst._TokenSecretKey, ApplicationConst.KcpIV);
-            Utility.Debug.LogInfo("对称加密 : "+desEnToken);
-            Utility.Debug.LogInfo("对称解密 : "+desDeToken);
-            var bitToken = Utility.Converter.GetBytes(desEnToken);
-            Utility.Debug.LogInfo(BitConverter.ToString(bitToken));
-            var deToken = GameManager.External.GetModule<JWTManager>().DecodeToken<UserInfo>(token);
-            Utility.Debug.LogInfo(deToken.ToString());
         }
     }
 }

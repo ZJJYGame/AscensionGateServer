@@ -12,10 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace AscensionGateServer
 {
-    /// <summary>
-    /// 泛型单例基类
-    /// </summary>
-    /// <typeparam name="E">泛型约束为当前类的子类</typeparam>
+    [OuterModule]
     public class NHManager:Module<NHManager>
     {
         #region Sync

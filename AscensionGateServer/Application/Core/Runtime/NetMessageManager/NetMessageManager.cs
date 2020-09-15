@@ -15,20 +15,22 @@ namespace AscensionGateServer
     //3、消息处理者完成消息处理后，则返回处理完成的消息；
     //4、发送处理好的消息；
     //==========================================
-
+    [OuterModule]
     public class NetMessageManager : Module<NetMessageManager>
     {
         INetMessageEncryptHelper netMsgEncryptHelper;
         Dictionary<ushort, MessagePacketHandler> handlerDict = new Dictionary<ushort, MessagePacketHandler>();
-        public void SetHelper(INetMessageEncryptHelper helper)
-        {
-            netMsgEncryptHelper = helper;
-        }
         public override void OnInitialization()
         {
             MessagePacket.SetHelper(new MessagePacketJsonHelper());
             NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, HandleMessage);
             InitHandler();
+            InitHelper();
+        }
+        void InitHelper()
+        {
+            var obj = Utility.Assembly.GetInstanceByAttribute<TargetHelperAttribute>(typeof(INetMessageEncryptHelper));
+            netMsgEncryptHelper = obj as INetMessageEncryptHelper;
         }
         /// <summary>
         /// 初始化消息处理者；

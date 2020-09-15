@@ -12,4 +12,10 @@
     <ProjectReference Include="..\CosmosFramework\CosmosFramework.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="RedisConfigData\RedisConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
