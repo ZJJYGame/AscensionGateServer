@@ -5,7 +5,6 @@ using StackExchange.Redis;
 using Cosmos;
 using System.Threading.Tasks;
 using System.Linq;
-using Cosmos;
 namespace RedisService
 {
     public sealed partial  class RedisHelper

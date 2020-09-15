@@ -1,22 +1,24 @@
-﻿/*
-*Author : Don
-*Since 	:2020-04-18
-*Description  : NHibernate帮助类
-*/
-using NHibernate;
+﻿using NHibernate;
 using NHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Cfg;
 using FluentNHibernate;
 using FluentNHibernate.Automapping;
+using Cosmos;
 
 namespace AscensionGateServer
 {
     public class NHibernateHelper
     {
+        static MySqlData sqlData;
+        static NHibernateHelper()
+        {
+            var result = GameManager.OuterModule<DataManager>().TryGetValue(out sqlData);
+            if (!result)
+                Utility.Debug.LogError("Get MySqlData fail，check your config file !");
+        }
         private static ISessionFactory _sessionFactory;
-
-        public  static ISessionFactory SessionFactory
+        public static ISessionFactory SessionFactory
         {
             get
             {
@@ -24,18 +26,15 @@ namespace AscensionGateServer
                 {
                     _sessionFactory = Fluently.Configure().
                         Database(MySQLConfiguration.Standard.
-                        ConnectionString(db => db.Server("192.168.0.117").
-                        //ConnectionString(db => db.Server("60.12.176.54").
-                        //ConnectionString(db => db.Server("127.0.0.1").
-                        Database("jygame").Username("jieyou").
-                        Password("jieyougamePWD"))).
+                        ConnectionString(db => db.Server(sqlData.Address).
+                        Database(sqlData.Database).Username(sqlData.Username).
+                        Password(sqlData.Password))).
                         Mappings(x => { x.FluentMappings.AddFromAssemblyOf<NHibernateHelper>(); }).
-                        BuildSessionFactory(); 
+                        BuildSessionFactory();
                 }
                 return _sessionFactory;
             }
         }
-
         public static ISession OpenSession()
         {
             return SessionFactory.OpenSession();//打开一个跟数据库的会话

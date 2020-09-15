@@ -23,6 +23,15 @@ namespace AscensionGateServer
             if (result)
             {
                 var obj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
+                NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", obj.Account);
+                NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", obj.Password);
+                var verified=NHibernateQuery.Verify<User>(nHCriteriaAccount, nHCriteriaPassword);
+                if (!verified)
+                {
+                    //验证失败则返回空
+                    messagePacket.ReturnCode = (byte)GateReturnCode.Empty;
+                    return messagePacket;
+                }
                 var token = JWTEncoder.EncodeToken(obj);
                 messagePacket.Messages = new Dictionary<byte, object>() 
                 {
@@ -34,6 +43,7 @@ namespace AscensionGateServer
                     messagePacket.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
                 messagePacket.ReturnCode = (byte)GateReturnCode.Success;
                 Utility.Debug.LogWarning(obj.ToString());
+                GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
             }
             else
             {

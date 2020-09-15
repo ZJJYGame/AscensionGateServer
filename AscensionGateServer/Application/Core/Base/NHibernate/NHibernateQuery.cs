@@ -12,8 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace AscensionGateServer
 {
-    [OuterModule]
-    public class NHManager:Module<NHManager>
+    public static class NHibernateQuery
     {
         #region Sync
         /// <summary>
@@ -23,7 +22,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="data">具体数据</param>
         /// <returns>返回一个完整带有主键ID的对象</returns>
-        public virtual T Insert<T>(T data) where T : class, new()
+        public static T Insert<T>(T data) where T : class, new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -43,7 +42,7 @@ namespace AscensionGateServer
         /// <typeparam name="K">查找类型</typeparam>
         /// <param name="key">查找索引字段</param>
         /// <returns></returns>
-        public virtual T Get<T>(object key)
+        public static T Get<T>(object key)
             where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
@@ -65,7 +64,7 @@ namespace AscensionGateServer
         /// <typeparam name="K">查找类型</typeparam>
         /// <param name="key">查找索引字段</param>
         /// <param name="key"></param>
-        public virtual T CriteriaSelect<T>(params NHCriteria[] columns)
+        public static T CriteriaSelect<T>(params NHCriteria[] columns)
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -84,7 +83,7 @@ namespace AscensionGateServer
         /// <typeparam name="T"></typeparam>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public virtual IList<T> CriteriaSelectList<T>(params NHCriteria[] columns)
+        public static IList<T> CriteriaSelectList<T>(params NHCriteria[] columns)
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -102,7 +101,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>验证是否成功</returns>
-        public virtual bool Verify<T>(params NHCriteria[] columns)
+        public static bool Verify<T>(params NHCriteria[] columns)
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -121,7 +120,7 @@ namespace AscensionGateServer
         /// <typeparam name="T"></typeparam>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public virtual int Count<T>(params NHCriteria[] columns)
+        public static int Count<T>(params NHCriteria[] columns)
             where T : class
         {
             using (ISession session = NHibernateHelper.OpenSession())
@@ -140,7 +139,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="data">具体数据</param>
-        public virtual void Delete<T>(T data) where T : new()
+        public static void Delete<T>(T data) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -157,7 +156,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="data">具体数据</param>
-        public virtual void Update<T>(T data) where T : new()
+        public static void Update<T>(T data) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -173,7 +172,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <typeparam name="T">无参构造的数据类型</typeparam>
         /// <param name="data">数据对象</param>
-        public virtual void SaveOrUpdate<T>(T data) where T : new()
+        public static void SaveOrUpdate<T>(T data) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -190,7 +189,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>查询到的对象集合</returns>
-        public virtual IList<T> CriteriaLike<T>(params NHCriteria[] columns) where T : new()
+        public static IList<T> CriteriaLike<T>(params NHCriteria[] columns) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -208,7 +207,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>查询到的对象集合</returns>
-        public virtual IList<T> CriteriaGt<T>(params NHCriteria[] columns) where T : new()
+        public static IList<T> CriteriaGt<T>(params NHCriteria[] columns) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -226,7 +225,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>查询到的对象集合</returns>
-        public virtual IList<T> CriteriaLt<T>(params NHCriteria[] columns) where T : new()
+        public static IList<T> CriteriaLt<T>(params NHCriteria[] columns) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -245,7 +244,7 @@ namespace AscensionGateServer
         /// <param name="propertyName">参数名</param>
         /// <param name="otherPropertyName">另一个参数名</param>
         /// <returns>查询到的对象集合</returns>
-        public virtual IList<T> CriteriaLtProperty<T>(string propertyName, string otherPropertyName) where T : new()
+        public static IList<T> CriteriaLtProperty<T>(string propertyName, string otherPropertyName) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -262,7 +261,7 @@ namespace AscensionGateServer
         /// <param name="propertyName">参数名</param>
         /// <param name="otherPropertyName">另一个参数名</param>
         /// <returns>查询到的对象集合</returns>
-        public virtual IList<T> CriteriaNotEqProperty<T>(string propertyName, string otherPropertyName) where T : new()
+        public static IList<T> CriteriaNotEqProperty<T>(string propertyName, string otherPropertyName) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -277,7 +276,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="expression">nhibernate表达式</param>
         /// <returns>查询到的对象集合</returns>
-        public virtual IList<T> CriteriaNot<T>(ICriterion expression) where T : new()
+        public static IList<T> CriteriaNot<T>(ICriterion expression) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -296,7 +295,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="data">具体数据</param>
         /// <returns>返回一个完整带有主键ID的对象</returns>
-        public async virtual Task<T> InsertAsync<T>(T data) where T : class, new()
+        public async static Task<T> InsertAsync<T>(T data) where T : class, new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -316,7 +315,7 @@ namespace AscensionGateServer
         /// <typeparam name="K">查找类型</typeparam>
         /// <param name="key">查找索引字段</param>
         /// <returns></returns>
-        public async virtual Task<T> GetAsync<T>(object key)
+        public async static Task<T> GetAsync<T>(object key)
             where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
@@ -338,7 +337,7 @@ namespace AscensionGateServer
         /// <typeparam name="K">查找类型</typeparam>
         /// <param name="key">查找索引字段</param>
         /// <param name="key"></param>
-        public async virtual Task<T> CriteriaSelectAsync<T>(params NHCriteria[] columns)
+        public async static Task<T> CriteriaSelectAsync<T>(params NHCriteria[] columns)
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -357,7 +356,7 @@ namespace AscensionGateServer
         /// <typeparam name="T"></typeparam>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public async virtual Task<IList<T>> CriteriaSelectListAsync<T>(params NHCriteria[] columns)
+        public async static Task<IList<T>> CriteriaSelectListAsync<T>(params NHCriteria[] columns)
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -375,7 +374,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>验证是否成功</returns>
-        public async virtual Task<bool> VerifyAsync<T>(params NHCriteria[] columns)
+        public async static Task<bool> VerifyAsync<T>(params NHCriteria[] columns)
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -394,7 +393,7 @@ namespace AscensionGateServer
         /// <typeparam name="T"></typeparam>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public async virtual Task<int> CountAsync<T>(params NHCriteria[] columns)
+        public async static Task<int> CountAsync<T>(params NHCriteria[] columns)
             where T : class
         {
             using (ISession session = NHibernateHelper.OpenSession())
@@ -414,7 +413,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="data">具体数据</param>
-        public async virtual Task DeleteAsync<T>(T data) where T : new()
+        public async static Task DeleteAsync<T>(T data) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -431,7 +430,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="data">具体数据</param>
-        public async virtual Task UpdateAsync<T>(T data) where T : new()
+        public async static Task UpdateAsync<T>(T data) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -447,7 +446,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <typeparam name="T">无参构造的数据类型</typeparam>
         /// <param name="data">数据对象</param>
-        public async virtual Task SaveOrUpdateAsync<T>(T data) where T : new()
+        public async static Task SaveOrUpdateAsync<T>(T data) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -464,7 +463,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>查询到的对象集合</returns>
-        public async virtual Task<IList<T>> CriteriaLikeAsync<T>(params NHCriteria[] columns) where T : new()
+        public async static Task<IList<T>> CriteriaLikeAsync<T>(params NHCriteria[] columns) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -482,7 +481,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>查询到的对象集合</returns>
-        public async virtual Task<IList<T>> CriteriaGtAsync<T>(params NHCriteria[] columns) where T : new()
+        public async static Task<IList<T>> CriteriaGtAsync<T>(params NHCriteria[] columns) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -500,7 +499,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="columns">column类对象</param>
         /// <returns>查询到的对象集合</returns>
-        public async virtual Task<IList<T>> CriteriaLtAsync<T>(params NHCriteria[] columns) where T : new()
+        public async static Task<IList<T>> CriteriaLtAsync<T>(params NHCriteria[] columns) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -519,7 +518,7 @@ namespace AscensionGateServer
         /// <param name="propertyName">参数名</param>
         /// <param name="otherPropertyName">另一个参数名</param>
         /// <returns>查询到的对象集合</returns>
-        public async virtual Task<IList<T>> CriteriaLtPropertyAsync<T>(string propertyName, string otherPropertyName) where T : new()
+        public async static Task<IList<T>> CriteriaLtPropertyAsync<T>(string propertyName, string otherPropertyName) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -536,7 +535,7 @@ namespace AscensionGateServer
         /// <param name="propertyName">参数名</param>
         /// <param name="otherPropertyName">另一个参数名</param>
         /// <returns>查询到的对象集合</returns>
-        public async virtual Task<IList<T>> CriteriaNotEqPropertyAsync<T>(string propertyName, string otherPropertyName) where T : new()
+        public async static Task<IList<T>> CriteriaNotEqPropertyAsync<T>(string propertyName, string otherPropertyName) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {
@@ -551,7 +550,7 @@ namespace AscensionGateServer
         /// <typeparam name="T">需要验证的类型</typeparam>
         /// <param name="expression">nhibernate表达式</param>
         /// <returns>查询到的对象集合</returns>
-        public async virtual Task<IList<T>> CriteriaNotAsync<T>(ICriterion expression) where T : new()
+        public async static Task<IList<T>> CriteriaNotAsync<T>(ICriterion expression) where T : new()
         {
             using (ISession session = NHibernateHelper.OpenSession())
             {

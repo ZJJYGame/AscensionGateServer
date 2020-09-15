@@ -41,7 +41,10 @@ namespace RedisService
             {
                 Redis = ConnectionMultiplexer.Connect(redisConfig.Configuration);
                 if (Redis == null)
-                    throw new ArgumentNullException("Redis Connect Fail");
+                {
+                    Utility.Debug.LogError(new ArgumentNullException("Redis Connect Fail"));
+                    return;
+                }
                 else
                 {
                     Utility.Debug.LogInfo("RedisService Connected");
@@ -50,7 +53,7 @@ namespace RedisService
             }
             catch (Exception)
             {
-                throw new RedisConnectionException(ConnectionFailureType.UnableToConnect, "Redis Connect Fail");
+                Utility.Debug.LogError(new RedisConnectionException(ConnectionFailureType.UnableToConnect, "Redis Connect Fail"));
             }
         }
         void LoadCfg()
