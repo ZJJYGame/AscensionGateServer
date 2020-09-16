@@ -6,10 +6,13 @@ using System.Text;
 
 namespace AscensionGateServer
 {
-    public class RegisterHandler : MessagePacketHandler
+    /// <summary>
+    /// 注册
+    /// </summary>
+    public class SignupHandler : MessagePacketHandler
     {
-        public override ushort OpCode { get; protected set; } = GateOperationCode._Register;
-        MessagePacket messagePacket = new MessagePacket((byte)GateOperationCode._Register);
+        public override ushort OpCode { get; protected set; } = GateOperationCode._Signup;
+        MessagePacket messagePacket = new MessagePacket((byte)GateOperationCode._Signup);
         public override MessagePacket Handle(MessagePacket packet)
         {
             var packetMsg = packet.Messages;

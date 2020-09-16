@@ -7,11 +7,11 @@ using RedisService;
 
 namespace AscensionGateServer
 {
-    public class UserInfoHandler : MessagePacketHandler
+    public class LoginHandler : MessagePacketHandler
     {
-        public override ushort OpCode { get; protected set; } = GateOperationCode._UserInfo;
-        MessagePacket messagePacket = new MessagePacket((byte)GateOperationCode._UserInfo);
-        string serverCfgFileName = "GameServerSetData.json";
+        public override ushort OpCode { get; protected set; } = GateOperationCode._Login;
+        MessagePacket messagePacket = new MessagePacket((byte)GateOperationCode._Login);
+        string srvCfgFileName = "GameServerSetData.json";
         public override MessagePacket Handle(MessagePacket packet)
         {
             var packetMsg = packet.Messages;
@@ -38,7 +38,7 @@ namespace AscensionGateServer
                     { (byte)GateParameterCode.Token, token },
                 };
                 string dat;
-                var hasDat = GameManager.OuterModule<ResourceManager>().TryGetValue(serverCfgFileName,out dat);
+                var hasDat = GameManager.OuterModule<ResourceManager>().TryGetValue(srvCfgFileName,out dat);
                 if (hasDat)
                     messagePacket.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
                 messagePacket.ReturnCode = (byte)GateReturnCode.Success;
