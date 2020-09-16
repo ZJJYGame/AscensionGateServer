@@ -11,6 +11,7 @@ namespace Protocol
         #region MessagePack Opcode
         public static readonly ushort _UserInfo = 1;
         public static readonly ushort _LoginOff =2 ;
+        public static readonly ushort _Register =3 ;
         public static readonly ushort _Token= 243;
         #endregion
 

@@ -11,6 +11,7 @@ namespace Protocol
         /// </summary>
         UserInfo = 3,
         Token = 4,
-        ServerInfo=5
+        ServerInfo=5,
+        User=6
     }
 }
