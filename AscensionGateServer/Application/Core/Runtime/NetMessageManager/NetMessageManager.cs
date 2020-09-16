@@ -80,18 +80,26 @@ namespace AscensionGateServer
             await Task.Run(() => 
             {
                 MessagePacket packet;
-                //这里是解码成明文后进行反序列化得到packet数据；
-                var result = netMsgEncryptHelper.Deserialize(netMsg.ServiceMsg, out packet);
-                if (!result)
-                    return;
-                MessagePacketHandler handler;
-                var exist = handlerDict.TryGetValue(packet.OperationCode, out handler);
-                if (exist)
+                try
                 {
-                    var mp = handler.Handle(packet);
-                    if (mp != null)
-                        SendMessage(netMsg, mp);
+                    //这里是解码成明文后进行反序列化得到packet数据；
+                    var result = netMsgEncryptHelper.Deserialize(netMsg.ServiceMsg, out packet);
+                    if (!result)
+                        return;
+                    MessagePacketHandler handler;
+                    var exist = handlerDict.TryGetValue(packet.OperationCode, out handler);
+                    if (exist)
+                    {
+                        var mp = handler.Handle(packet);
+                        if (mp != null)
+                            SendMessage(netMsg, mp);
+                    }
                 }
+                catch (Exception e)
+                {
+                    Utility.Debug.LogError(e);
+                }
+
             });
         }
         void SendMessage(INetworkMessage netMsg, MessagePacket packet)

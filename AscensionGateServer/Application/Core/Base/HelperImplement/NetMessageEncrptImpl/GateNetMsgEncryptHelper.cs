@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Cosmos;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AscensionGateServer
 {
+    [TargetHelper]
     /// <summary>
     /// 消息加密；
     /// </summary>
