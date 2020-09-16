@@ -14,7 +14,7 @@ using RedisService;
 
 namespace AscensionGateServer
 {
-    class Program
+    class ServerEntry
     {
         public delegate bool ControlCtrlDelegate(int CtrlType);
         [DllImport("kernel32.dll")]
@@ -35,7 +35,7 @@ namespace AscensionGateServer
             Utility.Json.SetHelper(new NewtonjsonHelper());
             Utility.Debug.LogInfo("Server Start Running !");
             GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
-            GameManager.InitOuterModule(typeof(ApplicationConst));
+            GameManager.InitOuterModule(typeof(ServerEntry).Assembly);
             Task.Run(GameManagerAgent.Instance.OnRefresh);
             RedisManager.Instance.OnInitialization();
             while (true) { }

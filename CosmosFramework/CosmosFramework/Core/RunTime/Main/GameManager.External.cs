@@ -34,9 +34,13 @@ namespace Cosmos
             else
                 return default(TModule);
         }
-        public static void InitOuterModule(Type type)
+        /// <summary>
+        /// 初始化外源模块
+        /// </summary>
+        /// <param name="assembly">模块所在程序集</param>
+        public static void InitOuterModule(Assembly  assembly)
         {
-            Type[] types = Assembly.GetAssembly(type).GetTypes();
+            Type[] types = assembly.GetTypes();
             for (int i = 0; i < types.Length; i++)
             {
                 if (types[i].GetCustomAttribute<OuterModuleAttribute>() != null)
