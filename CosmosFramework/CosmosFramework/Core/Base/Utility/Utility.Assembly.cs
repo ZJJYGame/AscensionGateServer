@@ -178,6 +178,29 @@ namespace Cosmos
                 return set.ToArray();
             }
             /// <summary>
+            /// 通过特性获取对象实体数组；
+            /// 生成的对象必须是无参可构造；
+            /// </summary>
+            /// <typeparam name="T">目标特性</typeparam>
+            /// <typeparam name="K">基类，new()约束</typeparam>
+            /// <returns>生成的对象数组</returns>
+            public static K[] GetInstancesByAttribute<T, K>()
+                where T : Attribute
+                where K : class
+            {
+                List<K> set = new List<K>();
+                var types = GetDerivedTypes(typeof(K));
+                int length = types.Length;
+                for (int i = 0; i < length; i++)
+                {
+                    if (types[i].GetCustomAttributes<T>() != null)
+                    {
+                        set.Add(GetTypeInstance(types[i]) as K);
+                    }
+                }
+                return set.ToArray();
+            }
+            /// <summary>
             /// 获取某类型的所有派生类数组；
             /// </summary>
             /// <param name="type">基类</param>
