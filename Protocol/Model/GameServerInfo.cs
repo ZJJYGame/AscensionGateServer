@@ -28,6 +28,10 @@ namespace Protocol
             /// </summary>
             public ushort Index { get; set; }
             /// <summary>
+            /// 服务器名
+            /// </summary>
+            public string ServerName{ get; set; }
+            /// <summary>
             /// 游戏逻辑服务器应用名；
             /// </summary>
             public string AppName { get; set; }

@@ -40,14 +40,16 @@ namespace AscensionGateServer
                 string dat;
                 var hasDat = GameManager.OuterModule<ResourceManager>().TryGetValue(srvCfgFileName,out dat);
                 if (hasDat)
+                {
                     messagePacket.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
+                }
                 messagePacket.ReturnCode = (byte)GateReturnCode.Success;
                 Utility.Debug.LogWarning(obj.ToString());
                 GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
             }
             else
             {
-                messagePacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
+                messagePacket.ReturnCode = (byte)GateReturnCode.Empty;
             }
             return messagePacket;
         }

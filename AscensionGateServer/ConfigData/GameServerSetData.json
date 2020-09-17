@@ -1,16 +1,39 @@
 ﻿{
   "GameServerList": [
     {
-      "Address": "127.0.0.1",
+      "Address": "192.168.0.117",
       "Port": 5055,
       "AppName": "AscensionGame",
-      "Index": 0
+      "Index": 0,
+      "ServerName": "内网公共服务器"
     },
     {
-      "Address": "127.0.0.1",
+      "Address": "192.168.0.182",
       "Port": 5055,
       "AppName": "AscensionGame",
-      "Index": 1
+      "Index": 1,
+      "ServerName": "俞志强"
+    },
+    {
+      "Address": "192.168.0.133",
+      "Port": 5055,
+      "AppName": "AscensionGame",
+      "Index": 2,
+      "ServerName": "陆进宇"
+    },
+    {
+      "Address": "192.168.0.150",
+      "Port": 5055,
+      "AppName": "AscensionGame",
+      "Index": 3,
+      "ServerName": "xianren"
+    },
+    {
+      "Address": "192.168.0.128",
+      "Port": 5055,
+      "AppName": "AscensionGame",
+      "Index": 4,
+      "ServerName": "郑佳东"
     }
   ]
 }
