@@ -150,8 +150,31 @@ namespace Cosmos
                 {
                     if (types[i].GetCustomAttribute<T>() != null)
                     {
-                        obj = GetTypeInstance(types[i]) ;
-                        return obj; 
+                        obj = GetTypeInstance(types[i]);
+                        return obj;
+                    }
+                }
+                return obj;
+            }
+            /// <summary>
+            /// 通过特性获取对象实体；
+            /// </summary>
+            /// <typeparam name="T">目标特性</typeparam>
+            /// <typeparam name="K">基类，new()约束</typeparam>
+            /// <returns>生成的对象</returns>
+            public static K GetInstanceByAttribute<T, K>()
+                where T : Attribute
+                where K : class
+            {
+                K obj = default;
+                var types = GetDerivedTypes(typeof(K));
+                int length = types.Length;
+                for (int i = 0; i < length; i++)
+                {
+                    if (types[i].GetCustomAttribute<T>() != null)
+                    {
+                        obj = GetTypeInstance(types[i]) as K;
+                        return obj;
                     }
                 }
                 return obj;
@@ -172,7 +195,7 @@ namespace Cosmos
                 {
                     if (types[i].GetCustomAttributes<T>() != null)
                     {
-                      set.Add(GetTypeInstance(types[i]));
+                        set.Add(GetTypeInstance(types[i]));
                     }
                 }
                 return set.ToArray();
