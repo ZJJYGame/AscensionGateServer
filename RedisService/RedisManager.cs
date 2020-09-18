@@ -19,11 +19,12 @@ namespace RedisService
         /// <summary>
         /// Redis保存数据时候key的前缀
         /// </summary>
-        internal static readonly string RedisKeyPrefix = "JY";
+        internal static readonly string RedisKeyPrefix = "JY_";
         /// <summary>
         /// Redis对象
         /// </summary>
         public ConnectionMultiplexer Redis { get; private set; }
+        public IServer[] RedisServers { get; private set; }
         /// <summary>
         /// Redis中的DB
         /// </summary>
@@ -48,6 +49,14 @@ namespace RedisService
                 else
                 {
                     Utility.Debug.LogInfo("RedisService Connected");
+                    List<IServer> servers = new List<IServer>();
+                    foreach (var endPoint in Redis.GetEndPoints())
+                    {
+                        
+                        var server = Redis.GetServer(endPoint);
+                        servers.Add(server);
+                    }
+                    RedisServers = servers.ToArray();
                 }
                 RedisDB = Redis.GetDatabase();
             }

@@ -21,7 +21,7 @@ namespace AscensionGateServer
         /// <returns>token</returns>
         public string EncodeToken(object value)
         {
-            return EncodeToken(value, ApplicationConst._JWTTokenKey);
+            return EncodeToken(value, ApplicationBuilder._JWTTokenKey);
         }
         /// <summary>
         /// 使用数据对象生成token；
@@ -46,7 +46,7 @@ namespace AscensionGateServer
         /// <returns>序列化的数据</returns>
         public string DecodeToken(string token)
         {
-            return DecodeToken(token, ApplicationConst._JWTTokenKey);
+            return DecodeToken(token, ApplicationBuilder._JWTTokenKey);
         }
         /// <summary>
         /// 解码token
@@ -83,7 +83,7 @@ namespace AscensionGateServer
         /// <returns>反序列化后的数据对象</returns>
         public T DecodeToken<T>(string token)
         {
-            return DecodeToken<T>(token, ApplicationConst._JWTTokenKey);
+            return DecodeToken<T>(token, ApplicationBuilder._JWTTokenKey);
         }
         /// <summary>
         /// 解码token

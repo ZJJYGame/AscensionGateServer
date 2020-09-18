@@ -40,5 +40,8 @@ namespace AscensionGateServer
             RedisManager.Instance.OnInitialization();
             while (true) { }
         }
+        static void RedisAssert()
+        {
+        }
     }
 }

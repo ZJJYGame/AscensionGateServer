@@ -5,6 +5,10 @@ using System.Text;
 
 namespace AscensionGateServer
 {
+    //=========================================
+    //流程说明：
+    //
+    //=========================================
     public class LogoffHandler: MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Logoff;
