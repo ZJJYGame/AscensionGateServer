@@ -21,11 +21,11 @@ namespace AscensionGateServer
     public class SignupHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Signup;
-        MessagePacket packet = new MessagePacket((byte)GateOperationCode._Signup);
+        MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Signup);
         Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
         public SignupHandler()
         {
-            packet.Messages = messageDict;
+            handlerPacket.Messages = messageDict;
         }
         public override MessagePacket Handle(MessagePacket packet)
         {
@@ -74,7 +74,7 @@ namespace AscensionGateServer
                         var hasDat = ApplicationBuilder.TryGetServerList(out dat);
                         if (hasDat)
                             packet.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
-                        this.packet.ReturnCode = (byte)GateReturnCode.Success;
+                        this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
                     }
                     GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
                     Utility.Debug.LogInfo($"Register user: {userObj}");
@@ -82,16 +82,16 @@ namespace AscensionGateServer
                 else
                 {
                     //账号存在
-                    this.packet.ReturnCode = (byte)GateReturnCode.ItemAlreadyExists;
+                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemAlreadyExists;
                 }
                 GameManager.ReferencePoolManager.Despawn(nHCriteriaAccount);
             }
             else
             {
                 //业务数据无效
-                this.packet.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
+                this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
             }
-            return this.packet;
+            return this.handlerPacket;
         }
     }
 }

@@ -20,11 +20,11 @@ namespace AscensionGateServer
     public class TokenHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Token;
-        MessagePacket packet = new MessagePacket((byte)GateOperationCode._Token);
+        MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Token);
         Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
         public TokenHandler()
         {
-            packet.Messages = messageDict;
+            handlerPacket.Messages = messageDict;
         }
         public override MessagePacket Handle(MessagePacket packet)
         {
@@ -36,8 +36,22 @@ namespace AscensionGateServer
             var result = packetMsg.TryGetValue((byte)GateParameterCode.Token, out data);
             if (result)
             {
+                string dataStr = null;
+                try
+                {
+                    dataStr = JWTEncoder.DecodeToken(data.ToString());
+                }
+                catch (Exception)
+                {
+                    Utility.Debug.LogError("token 解码失败");
+                }
                 //解码token
-                var dataStr = JWTEncoder.DecodeToken(data.ToString());
+                if (string.IsNullOrEmpty(dataStr))
+                {
+                    this.handlerPacket.ReturnCode = (short)GateReturnCode.Fail;
+                    Utility.Debug.LogWarning((GateReturnCode)this.handlerPacket.ReturnCode);
+                    return this.handlerPacket;
+                }
                 //反序列化为数据对象
                 var userInfoObj = Utility.Json.ToObject<UserInfo>(dataStr);
                 //组合键值
@@ -46,13 +60,13 @@ namespace AscensionGateServer
                 var tokenContext = RedisHelper.String.StringGetAsync(tokenKey).Result;
                 if (string.IsNullOrEmpty(tokenContext))
                 {
-                    this.packet.ReturnCode = (byte)GateReturnCode.ItemNotFound;
+                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.Empty;
                 }
                 else
                 {
                     if (data.ToString() == tokenContext)
                     {
-                        this.packet.ReturnCode = (byte)GateReturnCode.Success;
+                        this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
                         {
                             //添加服务器列表数据;
                             string dat;
@@ -77,16 +91,16 @@ namespace AscensionGateServer
                     else
                     {
                         //验证失败，返回fail
-                        this.packet.ReturnCode = (byte)GateReturnCode.Fail;
+                        this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
                     }
                 }
             }
             else
             {
                 //业务数据无效
-                this.packet.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
+                this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
             }
-            return this.packet;
+            return this.handlerPacket;
         }
     }
 }

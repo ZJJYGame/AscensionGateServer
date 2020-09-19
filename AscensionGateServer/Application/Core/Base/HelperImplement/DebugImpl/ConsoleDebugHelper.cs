@@ -61,7 +61,7 @@ namespace AscensionGateServer
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"FATAL : { msg}");
             Utility.Logger.Warring(msg.ToString());
             Console.ForegroundColor = ConsoleColor.White;

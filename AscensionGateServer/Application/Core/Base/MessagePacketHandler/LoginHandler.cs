@@ -17,11 +17,11 @@ namespace AscensionGateServer
     public class LoginHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Login;
-        MessagePacket packet = new MessagePacket((byte)GateOperationCode._Login);
+        MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Login);
         Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
         public LoginHandler()
         {
-            packet.Messages = messageDict;
+            handlerPacket.Messages = messageDict;
         }
         public override MessagePacket Handle(MessagePacket packet)
         {
@@ -40,8 +40,8 @@ namespace AscensionGateServer
                 if (!verified)
                 {
                     //验证失败则返回空
-                    this.packet.ReturnCode = (byte)GateReturnCode.ItemNotFound;
-                    return this.packet;
+                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
+                    return this.handlerPacket;
                 }
                 var token = JWTEncoder.EncodeToken(userInfoObj);
                 //获取对应键值的key
@@ -70,16 +70,16 @@ namespace AscensionGateServer
                         messageDict.Add((byte)GateParameterCode.ServerInfo, dat);
                     }
                 }
-                this.packet.ReturnCode = (byte)GateReturnCode.Success;
+                this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
                 Utility.Debug.LogWarning(userInfoObj.ToString());
                 GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
             }
             else
             {
                 //业务数据无效
-                this.packet.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
+                this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
             }
-            return this.packet;
+            return this.handlerPacket;
         }
     }
 }

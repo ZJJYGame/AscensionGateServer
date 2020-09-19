@@ -25,8 +25,10 @@ namespace AscensionGateServer
                     }
                     catch (Exception e)
                     {
+#if DEBUG
                         //仅仅打印Error消息
                         Utility.Debug.LogError($"MessagePacket 's  Parameters is empty : {e}");
+#endif
                     }
                     return mp;
                 }

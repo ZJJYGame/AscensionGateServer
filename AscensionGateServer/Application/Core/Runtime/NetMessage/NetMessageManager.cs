@@ -60,19 +60,6 @@ namespace AscensionGateServer
         /// <param name="netMsg">数据</param>
         void HandleMessage(INetworkMessage netMsg)
         {
-            //MessagePacket packet;
-            ////这里是解码成明文后进行反序列化得到packet数据；
-            //var result = netMsgEncryptHelper.Deserialize(netMsg.ServiceMsg, out packet);
-            //if (!result)
-            //    return;
-            //MessagePacketHandler handler;
-            //var exist = handlerDict.TryGetValue(packet.OperationCode, out handler);
-            //if (exist)
-            //{
-            //    var mp = handler.Handle(packet);
-            //    if (mp != null)
-            //        SendMessage(netMsg, mp);
-            //}
             var t= HandleMessageAsync(netMsg);
         }
         async Task HandleMessageAsync(INetworkMessage netMsg)
@@ -92,7 +79,9 @@ namespace AscensionGateServer
                     {
                         var mp = handler.Handle(packet);
                         if (mp != null)
+                        {
                             SendMessage(netMsg, mp);
+                        }
                     }
                 }
                 catch (Exception e)

@@ -70,7 +70,9 @@ namespace AscensionGateServer
             }
             catch (TokenExpiredException e)
             {
+#if DEBUG
                 Utility.Debug.LogError(e);
+#endif
                 return null;
             }
         }
@@ -108,7 +110,9 @@ namespace AscensionGateServer
             }
             catch (TokenExpiredException e)
             {
+#if DEBUG
                 Utility.Debug.LogError(e);
+#endif
                 return default(T);
             }
         }
