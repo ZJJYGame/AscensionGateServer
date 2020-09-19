@@ -143,12 +143,16 @@ namespace Cosmos
             /// </summary>
             /// <param name="fileFullPath">完整文件路径</param>
             /// <param name="context">内容</param>
-            public static void WriterFormattedBinary(string fileFullPath, object context)
+            /// <returns>是否写入成功</returns>
+            public static bool WriterFormattedBinary(string fileFullPath, object context)
             {
+                if (!File.Exists(fileFullPath))
+                    return false;
                 using (FileStream stream = new FileStream(fileFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
                 {
                     BinaryFormatter formatter = new BinaryFormatter();
                     formatter.Serialize(stream, context);
+                    return true;
                 }
             }
             /// <summary>
@@ -158,11 +162,25 @@ namespace Cosmos
             /// <returns>内容</returns>
             public static object ReadFormattedBinary(string fileFullPath)
             {
+                if (!File.Exists(fileFullPath))
+                    return null;
                 using (FileStream stream = new FileStream(fileFullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
                 {
                     BinaryFormatter formatter = new BinaryFormatter();
                     return formatter.Deserialize(stream);
                 }
+            }
+            /// <summary>
+            /// 清空text类型的文本
+            /// </summary>
+            /// <param name="fileFullPath">完整文件路径</param>
+            /// <returns>是否写入成功</returns>
+            public static bool ClearTextContext(string fileFullPath)
+            {
+                if (!File.Exists(fileFullPath))
+                    return false;
+                File.WriteAllText(fileFullPath, string.Empty);
+                return true;
             }
         }
     }
