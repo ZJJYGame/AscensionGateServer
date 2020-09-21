@@ -34,7 +34,7 @@ namespace AscensionGateServer
                 return null;
             messageDict.Clear();
             object data;
-            var result = packetMsg.TryGetValue((byte)GateParameterCode.User, out data);
+            var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
             if (result)
             {
                 var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
@@ -75,6 +75,7 @@ namespace AscensionGateServer
                         if (hasDat)
                             packet.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
                         this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
+                        messageDict.Add((byte)GateParameterCode.User, userObj);
                     }
                     GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
                     Utility.Debug.LogInfo($"Register user: {userObj}");

@@ -54,6 +54,7 @@ namespace AscensionGateServer
                 }
                 //反序列化为数据对象
                 var userInfoObj = Utility.Json.ToObject<UserInfo>(dataStr);
+           
                 //组合键值
                 var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
                 //获取对应键值的key
@@ -87,6 +88,11 @@ namespace AscensionGateServer
                                 RedisHelper.KeyExpire(data.ToString(), new TimeSpan(srcDat.Days, srcDat.Minutes, srcDat.Seconds));
                             }
                         }
+                        NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                        NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
+                        var userObj = NHibernateQuery.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
+                        messageDict.Add((byte)GateParameterCode.User, userObj);
+                        GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                     }
                     else
                     {
