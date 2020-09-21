@@ -13,7 +13,7 @@ namespace AscensionGateServer
         static MySqlData sqlData;
         static NHibernateHelper()
         {
-            var result = GameManager.OuterModule<DataManager>().TryGetValue(out sqlData);
+            var result = GameManager.CustomeModule<DataManager>().TryGetValue(out sqlData);
             if (!result)
                 Utility.Debug.LogError("Get MySqlData fail，check your config file !");
         }

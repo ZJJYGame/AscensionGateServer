@@ -56,7 +56,7 @@ namespace AscensionGateServer
                     var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
                     {
                         TokenExpireData dat;
-                        var hasDat = GameManager.OuterModule<DataManager>().TryGetValue(out dat);
+                        var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
                         //更新过期时间；
                         if (!hasDat)//没数据则默认一周；
                         {

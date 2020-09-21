@@ -76,7 +76,7 @@ namespace AscensionGateServer
                         }
                         {
                             TokenExpireData dat;
-                            var hasDat = GameManager.OuterModule<DataManager>().TryGetValue(out dat);
+                            var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
                             //更新过期时间；
                             if (!hasDat)//没数据则默认一周；
                                 RedisHelper.KeyExpire(data.ToString(), new TimeSpan(7, 0, 0));

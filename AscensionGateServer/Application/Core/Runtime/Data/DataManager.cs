@@ -4,7 +4,7 @@ using System.Text;
 using Cosmos;
 namespace AscensionGateServer
 {
-    [OuterModule]
+    [CustomeModule]
     public class DataManager : Module<DataManager>, ISimpleKeyValue<Type, IData>
     {
         IDataProvider dataProvider;

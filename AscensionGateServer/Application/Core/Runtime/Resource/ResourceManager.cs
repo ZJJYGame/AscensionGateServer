@@ -8,7 +8,7 @@ using FluentNHibernate.Utils;
 
 namespace AscensionGateServer
 {
-    [OuterModule]
+    [CustomeModule]
     public class ResourceManager : Module<ResourceManager>, ISimpleKeyValue<string, string>
     {
         IResourceProvider resProvider;

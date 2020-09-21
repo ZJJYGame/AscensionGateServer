@@ -14,7 +14,7 @@ namespace AscensionGateServer
         {
             dict = new Dictionary<Type, IData>();
             var datSet = Utility.Assembly.GetInstancesByAttribute<ConfigDataAttribute>(typeof(IData));
-            var dataDict = GameManager.OuterModule<ResourceManager>().ResDataDict;
+            var dataDict = GameManager.CustomeModule<ResourceManager>().ResDataDict;
             for (int i = 0; i < datSet.Length; i++)
             {
                 string json;

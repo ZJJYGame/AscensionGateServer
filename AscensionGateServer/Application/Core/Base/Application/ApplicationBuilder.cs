@@ -38,7 +38,7 @@ namespace AscensionGateServer
         }
         public static bool TryGetServerList(out string data)
         {
-            var hasData = GameManager.OuterModule<ResourceManager>().TryGetValue(srvCfgFileName, out data);
+            var hasData = GameManager.CustomeModule<ResourceManager>().TryGetValue(srvCfgFileName, out data);
             return hasData;
         }
     }

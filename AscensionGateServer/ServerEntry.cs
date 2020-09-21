@@ -4,7 +4,6 @@ using Cosmos.Network;
 using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
-using ProtocolCore;
 using Protocol;
 using System.Collections.Generic;
 using Lidgren.Network;
@@ -30,12 +29,11 @@ namespace AscensionGateServer
         static void Main(string[] args)
         {
             SetConsoleCtrlHandler(newDelegate, true);
-            Utility.Logger.SetHelper(new ConsoleLoggerHelper("AscensionGateServer"));
             Utility.Debug.SetHelper(new ConsoleDebugHelper());
             Utility.Json.SetHelper(new NewtonjsonHelper());
             Utility.Debug.LogInfo("Server Start Running !");
             GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
-            GameManager.InitOuterModule(typeof(ServerEntry).Assembly);
+            GameManager.InitCustomeModule(typeof(ServerEntry).Assembly);
             Task.Run(GameManagerAgent.Instance.OnRefresh);
             RedisManager.Instance.OnInitialization();
             while (true) { }
