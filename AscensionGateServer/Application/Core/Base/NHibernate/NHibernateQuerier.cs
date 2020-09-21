@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace AscensionGateServer
 {
-    public static class NHibernateQuery
+    public class NHibernateQuerier
     {
         #region Sync
         /// <summary>
@@ -198,6 +198,15 @@ namespace AscensionGateServer
                 {
                     criteria.Add(Restrictions.Like(columns[i].PropertyName, columns[i].Value));
                 }
+                return criteria.List<T>();
+            }
+        }
+        public static IList<T> CriteriaLike<T>(NHCriteria column, MatchMode matchMode) where T : new()
+        {
+            using (ISession session = NHibernateHelper.OpenSession())
+            {
+                ICriteria criteria = session.CreateCriteria(typeof(T));
+                criteria.Add(Restrictions.Like(column.PropertyName, Convert.ToString(column.Value), matchMode));
                 return criteria.List<T>();
             }
         }
@@ -475,6 +484,15 @@ namespace AscensionGateServer
                 return await criteria.ListAsync<T>();
             }
         }
+        public async static Task<IList<T>> CriteriaLikeAsync<T>(NHCriteria column, MatchMode matchMode) where T : new()
+        {
+            using (ISession session = NHibernateHelper.OpenSession())
+            {
+                ICriteria criteria = session.CreateCriteria(typeof(T));
+                criteria.Add(Restrictions.Like(column.PropertyName, Convert.ToString(column.Value), matchMode));
+                return await criteria.ListAsync<T>();
+            }
+        }
         /// <summary>
         /// 多条件验证，SQL语句为greater than
         /// </summary>
@@ -561,5 +579,4 @@ namespace AscensionGateServer
         }
         #endregion
     }
-
 }

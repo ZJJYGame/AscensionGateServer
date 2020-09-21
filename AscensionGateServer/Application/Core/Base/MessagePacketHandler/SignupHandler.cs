@@ -40,16 +40,16 @@ namespace AscensionGateServer
                 var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
                 NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
                 User userObj = new User() { Account = userInfoObj.Account, Password = userInfoObj.Password };
-                bool isExist = NHibernateQuery.Verify<User>(nHCriteriaAccount);
+                bool isExist = NHibernateQuerier.Verify<User>(nHCriteriaAccount);
                 if (!isExist)
                 {
-                    userObj = NHibernateQuery.Insert(userObj);
+                    userObj = NHibernateQuerier.Insert(userObj);
                     NHCriteria nHCriteriaUUID = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("UUID", userObj.UUID);
-                    bool userRoleExist =NHibernateQuery.Verify<UserRole>(nHCriteriaUUID);
+                    bool userRoleExist =NHibernateQuerier.Verify<UserRole>(nHCriteriaUUID);
                     if (!userRoleExist)
                     {
                         var userRole = new UserRole() { UUID = userObj.UUID };
-                        NHibernateQuery.Insert(userRole);
+                        NHibernateQuerier.Insert(userRole);
                     }
                     var token = JWTEncoder.EncodeToken(userInfoObj);
                     //获取对应键值的key

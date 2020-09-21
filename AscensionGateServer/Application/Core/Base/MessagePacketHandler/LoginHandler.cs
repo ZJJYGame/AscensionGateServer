@@ -36,7 +36,7 @@ namespace AscensionGateServer
                 var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
                 NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
                 NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
-                var userObj=NHibernateQuery.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
+                var userObj=NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
                 var verified = (userObj != null);
                 if (!verified)
                 {
