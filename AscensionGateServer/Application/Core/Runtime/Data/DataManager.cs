@@ -5,10 +5,10 @@ using Cosmos;
 namespace AscensionGateServer
 {
     [CustomeModule]
-    public class DataManager : Module<DataManager>, ISimpleKeyValue<Type, IData>
+    public class DataManager : Module<DataManager>, ISimpleKeyValue<Type, Data>
     {
         IDataProvider dataProvider;
-        Dictionary<Type, IData> dataDict = new Dictionary<Type, IData>();
+        Dictionary<Type, Data> dataDict = new Dictionary<Type, Data>();
         public override void OnInitialization()
         {
             InitProvider();
@@ -21,11 +21,11 @@ namespace AscensionGateServer
         {
             return dataDict.ContainsKey(key);
         }
-        public bool TryAdd(Type key, IData Value)
+        public bool TryAdd(Type key, Data Value)
         {
             return dataDict.TryAdd(key, Value);
         }
-        public bool TryGetValue(Type key, out IData value)
+        public bool TryGetValue(Type key, out Data value)
         {
             return dataDict.TryGetValue(key, out value);
         }
@@ -33,40 +33,40 @@ namespace AscensionGateServer
         {
             return dataDict.Remove(key);
         }
-        public bool TryRemove(Type key, out IData value)
+        public bool TryRemove(Type key, out Data value)
         {
             return dataDict.Remove(key, out value);
         }
         public bool ContainsKey<T>()
-            where T:class,IData
+            where T:Data
         {
             return ContainsKey(typeof(T));
         }
         public bool TryAdd<T>( T value)
-            where T : class, IData
+            where T : Data
         {
             return TryAdd(typeof(T), value);
         }
         public bool TryGetValue<T>( out T value)
-            where T : class, IData
+            where T :  Data
         {
             value = default;
-            IData data;
+            Data data;
             var result= TryGetValue(typeof(T), out data);
             if (result)
                 value = data as T;
             return result;
         }
         public bool TryRemove<T>()
-            where T : class, IData
+            where T : Data
         {
             return TryRemove(typeof(T));
         }
         public bool TryRemove<T>(out T value)
-            where T : class, IData
+            where T :  Data
         {
             value = default;
-            IData data;
+            Data data;
             var result = TryRemove(typeof(T),out data);
             if (result)
                 value = data as T;

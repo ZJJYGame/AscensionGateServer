@@ -10,10 +10,10 @@ namespace AscensionGateServer
     [TargetHelper]
     public class GateDataProvider : IDataProvider
     {
-        public void InitData(out Dictionary<Type, IData> dict)
+        public void InitData(out Dictionary<Type, Data> dict)
         {
-            dict = new Dictionary<Type, IData>();
-            var datSet = Utility.Assembly.GetInstancesByAttribute<ConfigDataAttribute>(typeof(IData));
+            dict = new Dictionary<Type, Data>();
+            var datSet = Utility.Assembly.GetInstancesByAttribute<ConfigDataAttribute>(typeof(Data),true);
             var dataDict = GameManager.CustomeModule<ResourceManager>().ResDataDict;
             for (int i = 0; i < datSet.Length; i++)
             {
@@ -26,7 +26,7 @@ namespace AscensionGateServer
                         var obj = Utility.Json.ToObject(json, datSet[i].GetType());
                         if (obj != null)
                         {
-                            dict.TryAdd(datSet[i].GetType(), obj as IData);
+                            dict.TryAdd(datSet[i].GetType(), obj as Data);
                         }
                     }
                     catch (Exception e)

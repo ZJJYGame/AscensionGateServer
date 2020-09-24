@@ -8,13 +8,13 @@ namespace AscensionGateServer
     /// token过期配置数据
     /// </summary>
     [Serializable]
-    public class TokenExpireData : IData
+    public class TokenExpireData : Data
     {
         public int Days { get; set; }
         public int Hours { get; set; }
         public int Minutes { get; set; }
         public int Seconds { get; set; }
-        public void SetData(object data)
+        public override void SetData(object data)
         {
             var rtcd = data as TokenExpireData;
             Days = rtcd.Days;

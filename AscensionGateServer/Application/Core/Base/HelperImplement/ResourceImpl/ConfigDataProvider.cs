@@ -17,7 +17,9 @@ namespace AscensionGateServer
             {
                 var str = Utility.IO.ReadTextFileContent(folderPath, f.Name);
                 resDataDict.Add(f.Name, str);
-                //Utility.Debug.LogInfo($"\n{f.Name}\n{str}\n");
+#if DEBUG
+                Utility.Debug.LogInfo($"\n{f.Name}\n{str}\n");
+#endif
             }
             return resDataDict;
         }

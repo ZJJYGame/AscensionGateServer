@@ -6,6 +6,6 @@ namespace AscensionGateServer
 {
     public interface IDataProvider
     {
-        void InitData(out Dictionary<Type,IData> dict);
+        void InitData(out Dictionary<Type,Data> dict);
     }
 }

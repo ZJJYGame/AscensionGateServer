@@ -5,8 +5,8 @@ using System.Text;
 namespace AscensionGateServer
 {
     [ConfigData]
-    public interface IData
+    public abstract class Data
     {
-        void SetData(object data);
+        public abstract void SetData(object data);
     }
 }

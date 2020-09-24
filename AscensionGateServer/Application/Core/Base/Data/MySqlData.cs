@@ -5,13 +5,13 @@ using System.Text;
 namespace AscensionGateServer
 {
     [Serializable]
-    public class MySqlData : IData
+    public class MySqlData : Data
     {
         public string Address { get; set; }
         public string Database { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public void SetData(object data)
+        public override void SetData(object data)
         {
             var dat = data as MySqlData;
             Address = dat.Address;
