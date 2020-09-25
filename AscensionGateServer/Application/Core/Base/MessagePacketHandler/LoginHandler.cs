@@ -36,7 +36,7 @@ namespace AscensionGateServer
                 var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
                 NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
                 NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
-                var userObj=NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
+                var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
                 var verified = (userObj != null);
                 if (!verified)
                 {
@@ -53,13 +53,13 @@ namespace AscensionGateServer
                     //更新过期时间；
                     if (!hasDat)//没数据则默认一周；
                     {
-                        var t= RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0, 0));
+                        var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0, 0));
                     }
                     else
                     {
                         //有数据则使用数据周期；
                         var srcDat = dat as TokenExpireData;
-                       var t= RedisHelper.String.StringSetAsync(tokenKey, new TimeSpan(srcDat.Days, srcDat.Minutes, srcDat.Seconds));
+                        var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(srcDat.Days, srcDat.Minutes, srcDat.Seconds));
                     }
                 }
                 messageDict.Add((byte)GateParameterCode.Token, token);
@@ -73,7 +73,7 @@ namespace AscensionGateServer
                 }
                 messageDict.Add((byte)GateParameterCode.User, userObj);
                 this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
-                Utility.Debug.LogWarning(userInfoObj.ToString());
+                Utility.Debug.LogInfo(userInfoObj.ToString());
                 GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
             }
             else

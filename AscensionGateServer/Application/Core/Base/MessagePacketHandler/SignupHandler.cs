@@ -65,7 +65,7 @@ namespace AscensionGateServer
                         else
                         {
                             //有数据则使用数据周期；
-                            var t = RedisHelper.String.StringSetAsync(tokenKey, new TimeSpan(dat.Days, dat.Minutes, dat.Seconds));
+                            var t = RedisHelper.String.StringSetAsync(tokenKey, token,new TimeSpan(dat.Days, dat.Minutes, dat.Seconds));
                         }
                     }
                     {

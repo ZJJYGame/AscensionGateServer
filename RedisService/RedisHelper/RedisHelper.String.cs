@@ -201,6 +201,11 @@ namespace RedisService
                 string jsonValue = Utility.Json.ToJson(obj);
                 return await redisDB.StringSetAsync(key, jsonValue, expiry);
             }
+            public static async Task<bool> StringSetAsync<T>(string key, string value, TimeSpan? expiry = default(TimeSpan?))
+            {
+                key = AddRedisKeyPrefix(key);
+                return await redisDB.StringSetAsync(key, value, expiry);
+            }
             /// <summary>
             /// 异步方法 在原有key的value值之后追加value
             /// </summary>

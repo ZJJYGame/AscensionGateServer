@@ -93,6 +93,7 @@ namespace AscensionGateServer
                         var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
                         messageDict.Add((byte)GateParameterCode.User, userObj);
                         GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
+                        Utility.Debug.LogInfo($"Token decoded message success",userObj); ;
                     }
                     else
                     {
