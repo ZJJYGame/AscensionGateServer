@@ -80,12 +80,12 @@ namespace AscensionGateServer
                             var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
                             //更新过期时间；
                             if (!hasDat)//没数据则默认一周；
-                                RedisHelper.KeyExpire(data.ToString(), new TimeSpan(7, 0, 0));
+                                RedisHelper.KeyExpire(data.ToString(), new TimeSpan(7,0, 0, 0));
                             else
                             {
                                 //有数据则使用数据周期；
                                 var srcDat = dat as TokenExpireData;
-                                RedisHelper.KeyExpire(data.ToString(), new TimeSpan(srcDat.Days, srcDat.Minutes, srcDat.Seconds));
+                                RedisHelper.KeyExpire(data.ToString(), new TimeSpan(srcDat.Days,srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
                             }
                         }
                         NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
