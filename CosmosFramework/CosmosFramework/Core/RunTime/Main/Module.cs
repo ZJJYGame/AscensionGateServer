@@ -46,7 +46,7 @@ namespace Cosmos
                 return Utility.Framework.GetModuleEnum(module);
             }
         }
-        public bool IsPause { get; protected set; }
+        public bool IsPause { get; protected set; } 
         #endregion
 
         #region Methods
