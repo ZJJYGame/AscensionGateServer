@@ -8,7 +8,7 @@ namespace AscensionGateServer
         static IJWTEncodeHelper tokenHelper;
         static JWTEncoder()
         {
-            var obj = Utility.Assembly.GetInstanceByAttribute<TargetHelperAttribute>(typeof(IJWTEncodeHelper));
+            var obj = Utility.Assembly.GetInstanceByAttribute<ImplementProviderAttribute>(typeof(IJWTEncodeHelper));
             tokenHelper = obj as IJWTEncodeHelper;
         }
         #region Sync

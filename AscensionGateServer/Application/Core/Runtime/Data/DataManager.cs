@@ -119,7 +119,7 @@ namespace AscensionGateServer
         }
         void InitProvider()
         {
-            var obj = Utility.Assembly.GetInstanceByAttribute<TargetHelperAttribute>(typeof(IDataProvider));
+            var obj = Utility.Assembly.GetInstanceByAttribute<ImplementProviderAttribute>(typeof(IDataProvider));
             dataProvider = obj as IDataProvider;
            jsonDict= dataProvider?.LoadData() as Dictionary<string,string>;
            dataDict= dataProvider?.ParseData() as Dictionary<Type,object>;

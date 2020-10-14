@@ -7,7 +7,7 @@ using Pipelines.Sockets.Unofficial.Arenas;
 
 namespace AscensionGateServer
 {
-    [TargetHelper]
+    [ImplementProvider]
     public class GateDataProvider : IDataProvider
     {
         string folderPath = Environment.CurrentDirectory + "/ConfigData";

@@ -29,7 +29,7 @@ namespace AscensionGateServer
         }
         void InitHelper()
         {
-            var obj = Utility.Assembly.GetInstanceByAttribute<TargetHelperAttribute>(typeof(INetMessageEncryptHelper));
+            var obj = Utility.Assembly.GetInstanceByAttribute<ImplementProviderAttribute>(typeof(INetMessageEncryptHelper));
             netMsgEncryptHelper = obj as INetMessageEncryptHelper;
         }
         /// <summary>

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AscensionGateServer
 {
-    [TargetHelper]
+    [ImplementProvider]
     /// <summary>
     /// 消息加密；
     /// </summary>

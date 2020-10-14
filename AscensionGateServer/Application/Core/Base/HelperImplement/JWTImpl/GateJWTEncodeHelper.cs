@@ -9,7 +9,7 @@ using System.Web;
 using Cosmos;
 namespace AscensionGateServer
 {
-    [TargetHelper]
+    [ImplementProvider]
     public class GateJWTEncodeHelper : IJWTEncodeHelper
     {
         readonly string _SecretKey = "292C08109FD07280B3E4B6AAF35C89A0";
