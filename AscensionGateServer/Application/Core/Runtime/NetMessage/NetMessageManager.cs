@@ -61,11 +61,11 @@ namespace AscensionGateServer
         /// <param name="netMsg">数据</param>
         void HandleMessage(INetworkMessage netMsg)
         {
-            var t= HandleMessageAsync(netMsg);
+             HandleMessageAsync(netMsg);
         }
-        async Task HandleMessageAsync(INetworkMessage netMsg)
+        async void HandleMessageAsync(INetworkMessage netMsg)
         {
-            await Task.Run(() => 
+            await Task.Run(() =>
             {
                 MessagePacket packet;
                 try
@@ -81,7 +81,7 @@ namespace AscensionGateServer
                         var mp = handler.Handle(packet);
                         if (mp != null)
                         {
-                            SendMessage(netMsg, mp);
+                            SendMessageAsync(netMsg, mp);
                         }
                     }
                 }
@@ -91,16 +91,20 @@ namespace AscensionGateServer
                 }
             });
         }
-        void SendMessage(INetworkMessage netMsg, MessagePacket packet)
+        async void SendMessageAsync(INetworkMessage netMsg, MessagePacket packet)
         {
-            byte[] packetBuffer;
-            //加密为密文byte[]；
-            var result = netMsgEncryptHelper.Serialize(packet, out packetBuffer);
-            if (result)
+            await Task.Run(() =>
             {
-                UdpNetMessage msg = UdpNetMessage.EncodeMessageAsync(netMsg.Conv, netMsg.OperationCode, packetBuffer).Result;
-                GameManager.NetworkManager.SendNetworkMessage(msg);
-            }
+                byte[] packetBuffer;
+                //加密为密文byte[]；
+                var result = netMsgEncryptHelper.Serialize(packet, out packetBuffer);
+                if (result)
+                {
+                    UdpNetMessage msg = UdpNetMessage.EncodeMessage(netMsg.Conv, netMsg.OperationCode, packetBuffer);
+                    GameManager.NetworkManager.SendNetworkMessage(msg);
+                }
+            });
+
         }
     }
 }
