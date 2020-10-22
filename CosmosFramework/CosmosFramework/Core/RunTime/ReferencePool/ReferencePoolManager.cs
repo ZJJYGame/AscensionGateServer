@@ -1,38 +1,39 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System;
 namespace Cosmos.Reference
 {
-    public sealed class ReferencePoolManager :Module<ReferencePoolManager>
+    public sealed class ReferencePoolManager : Module<ReferencePoolManager>
     {
         #region Properties
         /// <summary>
         /// 单个引用池上线
         /// </summary>
-        internal static readonly short _ReferencePoolCapcity= 5000;
-        Dictionary<Type, ReferenceSpawnPool> referenceDict = new Dictionary<Type, ReferenceSpawnPool>();
+        internal static readonly short _ReferencePoolCapcity = 5000;
+        ConcurrentDictionary<Type, ReferenceSpawnPool> referenceDict = new ConcurrentDictionary<Type, ReferenceSpawnPool>();
         #endregion
 
         #region Methods
-        public int GetPoolCount<T>() 
+        public int GetPoolCount<T>()
             where T : class, IReference, new()
         {
             try
             {
-                    return referenceDict[typeof(T)].ReferenceCount;
+                return referenceDict[typeof(T)].ReferenceCount;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 throw new ArgumentNullException("Type :" + typeof(T).FullName + " not register in reference pool");
             }
         }
-        public T Spawn<T>() 
-            where T: class, IReference ,new()
+        public T Spawn<T>()
+            where T : class, IReference, new()
         {
             Type type = typeof(T);
             if (!referenceDict.ContainsKey(type))
             {
-                referenceDict.Add(type, new ReferenceSpawnPool());
+                referenceDict.TryAdd(type, new ReferenceSpawnPool());
             }
             return referenceDict[type].Spawn<T>() as T;
         }
@@ -42,7 +43,7 @@ namespace Cosmos.Reference
             Type type = typeof(T);
             if (!referenceDict.ContainsKey(type))
             {
-                referenceDict.Add(type, new ReferenceSpawnPool());
+                referenceDict.TryAdd(type, new ReferenceSpawnPool());
             }
             return referenceDict[type].Spawn<T>();
         }
@@ -50,7 +51,7 @@ namespace Cosmos.Reference
         {
             if (!referenceDict.ContainsKey(type))
             {
-                referenceDict.Add(type, new ReferenceSpawnPool());
+                referenceDict.TryAdd(type, new ReferenceSpawnPool());
             }
             return referenceDict[type].Spawn(type);
         }
@@ -58,7 +59,7 @@ namespace Cosmos.Reference
         {
             Type type = refer.GetType();
             if (!referenceDict.ContainsKey(type))
-                referenceDict.Add(type, new ReferenceSpawnPool());
+                referenceDict.TryAdd(type, new ReferenceSpawnPool());
             referenceDict[type].Despawn(refer);
         }
         public void Despawns(params IReference[] refers)
@@ -67,17 +68,17 @@ namespace Cosmos.Reference
             {
                 Type type = refers[i].GetType();
                 if (!referenceDict.ContainsKey(type))
-                    referenceDict.Add(type, new ReferenceSpawnPool());
+                    referenceDict.TryAdd(type, new ReferenceSpawnPool());
                 referenceDict[type].Despawn(refers[i]);
             }
         }
         public void Despawns<T>(List<T> refers)
-            where T:class ,IReference,new()
+            where T : class, IReference, new()
         {
             Type type = typeof(T);
             if (!referenceDict.ContainsKey(type))
             {
-                referenceDict.Add(type, new ReferenceSpawnPool());
+                referenceDict.TryAdd(type, new ReferenceSpawnPool());
             }
             if (refers.Count <= 0)
                 return;
@@ -88,12 +89,12 @@ namespace Cosmos.Reference
             refers.Clear();
         }
         public void Despawns<T>(T[] refers)
-            where T :class,IReference,new()
+            where T : class, IReference, new()
         {
             Type type = typeof(T);
             if (!referenceDict.ContainsKey(type))
             {
-                referenceDict.Add(type, new ReferenceSpawnPool());
+                referenceDict.TryAdd(type, new ReferenceSpawnPool());
             }
             if (refers.Length <= 0)
                 return;

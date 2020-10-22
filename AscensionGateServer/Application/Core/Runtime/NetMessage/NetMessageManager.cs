@@ -89,7 +89,6 @@ namespace AscensionGateServer
                 {
                     Utility.Debug.LogError(e);
                 }
-
             });
         }
         void SendMessage(INetworkMessage netMsg, MessagePacket packet)

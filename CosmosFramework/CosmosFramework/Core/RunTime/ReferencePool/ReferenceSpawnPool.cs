@@ -1,17 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System;
 namespace Cosmos.Reference
 {
     internal sealed class ReferenceSpawnPool 
     {
-        Queue<IReference> referenceQueue = new Queue<IReference>();
+        ConcurrentQueue<IReference> referenceQueue = new ConcurrentQueue<IReference>();
         internal int ReferenceCount { get { return referenceQueue.Count; } }
         internal IReference Spawn(Type type)
         {
             IReference refer;
             if (referenceQueue.Count > 0)
-                refer = referenceQueue.Dequeue();
+            {
+                referenceQueue.TryDequeue(out var reference);
+                refer = reference;
+            }
             else
                 refer = Utility.Assembly.GetTypeInstance(type) as IReference;
             return refer;
@@ -21,7 +25,10 @@ namespace Cosmos.Reference
         {
             IReference refer;
             if (referenceQueue.Count > 0)
-                refer = referenceQueue.Dequeue();
+            {
+                referenceQueue.TryDequeue(out var reference);
+                refer = reference;
+            }
             else
                 refer = new T() as IReference;
             return refer;
