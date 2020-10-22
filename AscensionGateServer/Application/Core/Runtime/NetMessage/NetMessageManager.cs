@@ -23,7 +23,6 @@ namespace AscensionGateServer
         ConcurrentDictionary<ushort, MessagePacketHandler> handlerDict = new ConcurrentDictionary<ushort, MessagePacketHandler>();
         public override void OnInitialization()
         {
-            MessagePacket.SetHelper(new MessagePacketJsonHelper());
             NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, HandleMessage);
             InitHandler();
             InitHelper();
@@ -61,21 +60,19 @@ namespace AscensionGateServer
         /// <param name="netMsg">数据</param>
         void HandleMessage(INetworkMessage netMsg)
         {
-             HandleMessageAsync(netMsg);
+            HandleMessageAsync(netMsg);
         }
         async void HandleMessageAsync(INetworkMessage netMsg)
         {
             await Task.Run(() =>
             {
-                MessagePacket packet;
                 try
                 {
                     //这里是解码成明文后进行反序列化得到packet数据；
-                    var result = netMsgEncryptHelper.Deserialize(netMsg.ServiceMsg, out packet);
-                    if (!result)
+                    MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
+                    if (packet == null)
                         return;
-                    MessagePacketHandler handler;
-                    var exist = handlerDict.TryGetValue(packet.OperationCode, out handler);
+                    var exist = handlerDict.TryGetValue(packet.OperationCode, out var handler);
                     if (exist)
                     {
                         var mp = handler.Handle(packet);
@@ -95,10 +92,9 @@ namespace AscensionGateServer
         {
             await Task.Run(() =>
             {
-                byte[] packetBuffer;
                 //加密为密文byte[]；
-                var result = netMsgEncryptHelper.Serialize(packet, out packetBuffer);
-                if (result)
+                byte[] packetBuffer=Utility.MessagePack.ToByteArray(packet);
+                if (packetBuffer!=null)
                 {
                     UdpNetMessage msg = UdpNetMessage.EncodeMessage(netMsg.Conv, netMsg.OperationCode, packetBuffer);
                     GameManager.NetworkManager.SendNetworkMessage(msg);

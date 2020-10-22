@@ -31,6 +31,7 @@ namespace AscensionGateServer
             SetConsoleCtrlHandler(newDelegate, true);
             Utility.Debug.SetHelper(new ConsoleDebugHelper());
             Utility.Json.SetHelper(new NewtonjsonHelper());
+            Utility.MessagePack.SetHelper(new ImplMessagePackHelper());
             Utility.Debug.LogInfo("Server Start Running !");
             GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
             GameManager.InitCustomeModule(typeof(ServerEntry).Assembly);

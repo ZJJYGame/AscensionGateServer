@@ -1,4 +1,5 @@
 ﻿using Cosmos;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,9 +7,7 @@ using System.Threading.Tasks;
 
 namespace AscensionGateServer
 {
-    /// <summary>
-    ///序列化顺序：OpCode-> Parameters->ReturnCode
-    /// </summary>
+    [MessagePackObject]
     public class MessagePacket
     {
         public object this[byte messageKey]
@@ -25,11 +24,13 @@ namespace AscensionGateServer
             }
         }
         public string DebugMessage { get; set; }
+        [Key(0)]
         public byte OperationCode { get; set; }
+        [Key(1)]
         public Dictionary<byte, object> Messages { get; set; }
+        [Key(2)]
         public short ReturnCode { get; set; }
         object dataContract;
-        static IMessagePacketSerializeHelper serializationHelper;
         public MessagePacket() { }
         public MessagePacket(byte operationCode)
         {
@@ -50,26 +51,6 @@ namespace AscensionGateServer
         public void SetMessages(Dictionary<byte, object> messages)
         {
             this.Messages = messages;
-        }
-        public static void SetHelper(IMessagePacketSerializeHelper helper)
-        {
-            serializationHelper = helper;
-        }
-        public static byte[] Serialize(MessagePacket msgPack)
-        {
-            return serializationHelper.Serialize(msgPack);
-        }
-        public static MessagePacket Deserialize(byte[] data)
-        {
-            return serializationHelper.Deserialize(data);
-        }
-        public async static Task<byte[]> SerializeAsync(MessagePacket msgPack)
-        {
-            return await Task.Run(() => { return serializationHelper.Serialize(msgPack); });
-        }
-        public async static Task<MessagePacket> DeserializeAsync(byte[] data)
-        {
-            return await Task.Run(() => { return serializationHelper.Deserialize(data); });
         }
     }
 }
