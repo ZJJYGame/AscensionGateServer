@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace AscensionGateServer
     public class NetMessageManager : Module<NetMessageManager>
     {
         INetMessageEncryptHelper netMsgEncryptHelper;
-        Dictionary<ushort, MessagePacketHandler> handlerDict = new Dictionary<ushort, MessagePacketHandler>();
+        ConcurrentDictionary<ushort, MessagePacketHandler> handlerDict = new ConcurrentDictionary<ushort, MessagePacketHandler>();
         public override void OnInitialization()
         {
             MessagePacket.SetHelper(new MessagePacketJsonHelper());
@@ -47,7 +48,7 @@ namespace AscensionGateServer
                     {
                         var handler = Utility.Assembly.GetTypeInstance(types[i]) as MessagePacketHandler;
                         handler.OnInitialization();
-                        handlerDict.Add(handler.OpCode, handler);
+                        handlerDict.TryAdd(handler.OpCode, handler);
                     }
                 }
             }
