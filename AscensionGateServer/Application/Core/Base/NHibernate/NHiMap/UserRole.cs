@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cosmos;
+using MessagePack;
+
 namespace AscensionGateServer
 {
     [Serializable]
+    [MessagePackObject]
     public class UserRole
     {
+        [Key(0)]
         public virtual string UUID { get; set; }
+        [Key(1)]
         public virtual string RoleIDArray { get; set; }
         public override bool Equals(object obj)
         {

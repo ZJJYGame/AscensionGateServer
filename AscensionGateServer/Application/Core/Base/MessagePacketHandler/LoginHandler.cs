@@ -71,7 +71,7 @@ namespace AscensionGateServer
                         messageDict.Add((byte)GateParameterCode.ServerInfo, dat);
                     }
                 }
-                messageDict.Add((byte)GateParameterCode.User, userObj);
+                messageDict.Add((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
                 this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
                 Utility.Debug.LogInfo(userInfoObj.ToString());
                 GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);

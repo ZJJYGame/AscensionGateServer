@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MessagePack" Version="2.2.60" />
+    <PackageReference Include="MessagePack.Annotations" Version="2.2.60" />
+  </ItemGroup>
+
 </Project>

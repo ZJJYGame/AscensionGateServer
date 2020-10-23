@@ -23,6 +23,7 @@ namespace AscensionGateServer
                 Messages.TryAdd(messageKey, value);
             }
         }
+        [IgnoreMember]
         public string DebugMessage { get; set; }
         [Key(0)]
         public byte OperationCode { get; set; }
@@ -30,6 +31,7 @@ namespace AscensionGateServer
         public Dictionary<byte, object> Messages { get; set; }
         [Key(2)]
         public short ReturnCode { get; set; }
+        [IgnoreMember]
         object dataContract;
         public MessagePacket() { }
         public MessagePacket(byte operationCode)

@@ -14,7 +14,7 @@ namespace AscensionGateServer
         //TODO  GateNetMsgEncryptHelper 消息未加密
         public bool Serialize(MessagePacket packet, out byte[] messageBuffer)
         {
-            messageBuffer = MessagePacket.Serialize(packet);
+            messageBuffer = Utility.MessagePack.ToByteArray(packet);
             if (messageBuffer != null)
                 return true;
             else
@@ -22,7 +22,7 @@ namespace AscensionGateServer
         }
         public bool Deserialize(byte[] messageBuffer, out MessagePacket packet)
         {
-            packet = MessagePacket.Deserialize(messageBuffer);
+            packet= Utility.MessagePack.ToObject<MessagePacket>(messageBuffer);
             if (packet != null)
                 return true;
             else

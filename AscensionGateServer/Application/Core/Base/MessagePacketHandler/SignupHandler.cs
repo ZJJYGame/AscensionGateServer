@@ -75,7 +75,7 @@ namespace AscensionGateServer
                         if (hasDat)
                             packet.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
                         this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
-                        messageDict.Add((byte)GateParameterCode.User, userObj);
+                        messageDict.Add((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
                     }
                     GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
                     Utility.Debug.LogInfo($"Register user: {userObj}");

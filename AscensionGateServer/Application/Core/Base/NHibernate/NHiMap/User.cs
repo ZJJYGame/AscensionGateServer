@@ -1,12 +1,18 @@
 ﻿using System.Collections.Generic;
 using System;
+using MessagePack;
+
 namespace AscensionGateServer
 {
     [Serializable]
+    [MessagePackObject]
     public class User
     {
+        [Key(0)]
         public virtual string Account { get; set; }
+        [Key(1)]
         public virtual string Password { get; set; }
+        [Key(2)]
         public virtual string UUID { get; set; }
         public override bool Equals(object obj)
         {

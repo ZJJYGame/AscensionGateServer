@@ -37,7 +37,7 @@ namespace Protocol
             /// <summary>
             /// 服务器名
             /// </summary>
-            public string ServerName{ get; set; }
+            public string ServerName { get; set; }
             [Key(4)]
             /// <summary>
             /// 游戏逻辑服务器应用名；
