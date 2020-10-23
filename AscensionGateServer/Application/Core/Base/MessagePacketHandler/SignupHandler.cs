@@ -22,16 +22,13 @@ namespace AscensionGateServer
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Signup;
         MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Signup);
-        Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
-        public SignupHandler()
-        {
-            handlerPacket.Messages = messageDict;
-        }
         public override MessagePacket Handle(MessagePacket packet)
         {
             var packetMsg = packet.Messages;
             if (packetMsg == null)
                 return null;
+            Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
+            handlerPacket.Messages = messageDict;
             messageDict.Clear();
             object data;
             var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
@@ -75,7 +72,7 @@ namespace AscensionGateServer
                         if (hasDat)
                             packet.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
                         this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
-                        messageDict.Add((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
+                        messageDict.TryAdd((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
                     }
                     GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
                     Utility.Debug.LogInfo($"Register user: {userObj}");

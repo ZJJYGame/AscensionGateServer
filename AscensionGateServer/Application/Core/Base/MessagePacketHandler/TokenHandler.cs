@@ -1,11 +1,10 @@
-﻿using NHibernate.Proxy;
-using Protocol;
+﻿using Protocol;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Text;
 using Cosmos;
 using RedisService;
-using System.Net.WebSockets;
 
 namespace AscensionGateServer
 {
@@ -21,16 +20,13 @@ namespace AscensionGateServer
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Token;
         MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Token);
-        Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
-        public TokenHandler()
-        {
-            handlerPacket.Messages = messageDict;
-        }
         public override MessagePacket Handle(MessagePacket packet)
         {
             var packetMsg = packet.Messages;
             if (packetMsg == null)
                 return null;
+            Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
+            handlerPacket.Messages = messageDict;
             messageDict.Clear();
             object data;
             var result = packetMsg.TryGetValue((byte)GateParameterCode.Token, out data);
@@ -73,7 +69,7 @@ namespace AscensionGateServer
                             string dat;
                             var hasDat = ApplicationBuilder.TryGetServerList(out dat);
                             if (hasDat)
-                                messageDict.Add((byte)GateParameterCode.ServerInfo, dat);
+                                messageDict.TryAdd((byte)GateParameterCode.ServerInfo, dat);
                         }
                         {
                             TokenExpireData dat;
@@ -91,7 +87,7 @@ namespace AscensionGateServer
                         NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
                         NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
                         var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
-                        messageDict.Add((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
+                        messageDict.TryAdd((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
                         GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                         Utility.Debug.LogInfo($"Token decoded message success",userObj); ;
                     }
