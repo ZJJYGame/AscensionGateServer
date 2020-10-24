@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Cosmos;
 namespace AscensionGateServer
 {
@@ -13,7 +14,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <param name="packet">消息体</param>
         /// <returns></returns>
-        public abstract  MessagePacket Handle (MessagePacket packet);
+        public  abstract  Task<MessagePacket >HandleAsync (MessagePacket packet);
         /// <summary>
         /// 空虚函数；
         /// </summary>

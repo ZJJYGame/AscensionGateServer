@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using RedisService;
+using System.Threading.Tasks;
 
 namespace AscensionGateServer
 {
@@ -18,68 +19,70 @@ namespace AscensionGateServer
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Login;
         MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Login);
-        public override MessagePacket Handle(MessagePacket packet)
+        public async override Task<MessagePacket> HandleAsync(MessagePacket packet)
         {
-
-            var packetMsg = packet.Messages;
-            if (packetMsg == null)
-                return null;
-            Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
-            handlerPacket.Messages = messageDict;
-            messageDict.Clear();
-            object data;
-            var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
-            if (result)
-            {
-                var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
-                NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
-                NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
-                var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
-                var verified = (userObj != null);
-                if (!verified)
+            return await Task.Run(() => {
+                var packetMsg = packet.Messages;
+                if (packetMsg == null)
+                    return null;
+                Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
+                handlerPacket.Messages = messageDict;
+                messageDict.Clear();
+                object data;
+                var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
+                if (result)
                 {
-                    //验证失败则返回空
-                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
-                    return this.handlerPacket;
+                    var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
+                    NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                    NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
+                    var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
+                    var verified = (userObj != null);
+                    if (!verified)
+                    {
+                        //验证失败则返回空
+                        this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
+                        return this.handlerPacket;
+                    }
+                    var token = JWTEncoder.EncodeToken(userInfoObj);
+                    //获取对应键值的key
+                    var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
+                    {
+                        TokenExpireData dat;
+                        var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
+                        //更新过期时间；
+                        if (!hasDat)//没数据则默认一周；
+                        {
+                            var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0, 0, 0));
+                        }
+                        else
+                        {
+                            //有数据则使用数据周期；
+                            var srcDat = dat as TokenExpireData;
+                            var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(srcDat.Days, srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
+                        }
+                    }
+                    messageDict.TryAdd((byte)GateParameterCode.Token, token);
+                    {
+                        string dat;
+                        var hasDat = ApplicationBuilder.TryGetServerList(out dat);
+                        if (hasDat)
+                        {
+                            messageDict.TryAdd((byte)GateParameterCode.ServerInfo, dat);
+                        }
+                    }
+                    messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
+                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
+                    Utility.Debug.LogInfo(userInfoObj.ToString());
+                    GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                 }
-                var token = JWTEncoder.EncodeToken(userInfoObj);
-                //获取对应键值的key
-                var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
+                else
                 {
-                    TokenExpireData dat;
-                    var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
-                    //更新过期时间；
-                    if (!hasDat)//没数据则默认一周；
-                    {
-                        var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7,0, 0, 0));
-                    }
-                    else
-                    {
-                        //有数据则使用数据周期；
-                        var srcDat = dat as TokenExpireData;
-                        var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(srcDat.Days, srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
-                    }
+                    //业务数据无效
+                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                messageDict.TryAdd((byte)GateParameterCode.Token, token);
-                {
-                    string dat;
-                    var hasDat = ApplicationBuilder.TryGetServerList(out dat);
-                    if (hasDat)
-                    {
-                        messageDict.TryAdd((byte)GateParameterCode.ServerInfo, dat);
-                    }
-                }
-                messageDict.TryAdd((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
-                this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
-                Utility.Debug.LogInfo(userInfoObj.ToString());
-                GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
-            }
-            else
-            {
-                //业务数据无效
-                this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
-            }
-            return this.handlerPacket;
+                return this.handlerPacket;
+            });
+        
         }
     }
 }

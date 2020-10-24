@@ -4,6 +4,7 @@ using RedisService;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AscensionGateServer
 {
@@ -22,74 +23,77 @@ namespace AscensionGateServer
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Signup;
         MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Signup);
-        public override MessagePacket Handle(MessagePacket packet)
+        public async override Task<MessagePacket> HandleAsync(MessagePacket packet)
         {
-            var packetMsg = packet.Messages;
-            if (packetMsg == null)
-                return null;
-            Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
-            handlerPacket.Messages = messageDict;
-            messageDict.Clear();
-            object data;
-            var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
-            if (result)
+            return await Task.Run(() =>
             {
-                var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
-                NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
-                User userObj = new User() { Account = userInfoObj.Account, Password = userInfoObj.Password };
-                bool isExist = NHibernateQuerier.Verify<User>(nHCriteriaAccount);
-                if (!isExist)
+                var packetMsg = packet.Messages;
+                if (packetMsg == null)
+                    return null;
+                Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
+                handlerPacket.Messages = messageDict;
+                messageDict.Clear();
+                object data;
+                var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
+                if (result)
                 {
-                    userObj = NHibernateQuerier.Insert(userObj);
-                    NHCriteria nHCriteriaUUID = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("UUID", userObj.UUID);
-                    bool userRoleExist =NHibernateQuerier.Verify<UserRole>(nHCriteriaUUID);
-                    if (!userRoleExist)
+                    var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
+                    NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                    User userObj = new User() { Account = userInfoObj.Account, Password = userInfoObj.Password };
+                    bool isExist = NHibernateQuerier.Verify<User>(nHCriteriaAccount);
+                    if (!isExist)
                     {
-                        var userRole = new UserRole() { UUID = userObj.UUID };
-                        NHibernateQuerier.Insert(userRole);
-                    }
-                    var token = JWTEncoder.EncodeToken(userInfoObj);
-                    //获取对应键值的key
-                    var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
-                    {
-                        TokenExpireData dat;
-                        var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
-                        //更新过期时间；
-                        if (!hasDat)//没数据则默认一周；
+                        userObj = NHibernateQuerier.Insert(userObj);
+                        NHCriteria nHCriteriaUUID = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("UUID", userObj.UUID);
+                        bool userRoleExist = NHibernateQuerier.Verify<UserRole>(nHCriteriaUUID);
+                        if (!userRoleExist)
                         {
-                            var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0,0, 0));
+                            var userRole = new UserRole() { UUID = userObj.UUID };
+                            NHibernateQuerier.Insert(userRole);
                         }
-                        else
+                        var token = JWTEncoder.EncodeToken(userInfoObj);
+                        //获取对应键值的key
+                        var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
                         {
-                            //有数据则使用数据周期；
-                            var t = RedisHelper.String.StringSetAsync(tokenKey, token,new TimeSpan(dat.Days, dat.Hours,dat.Minutes, dat.Seconds));
+                            TokenExpireData dat;
+                            var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
+                            //更新过期时间；
+                            if (!hasDat)//没数据则默认一周；
+                            {
+                                var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0, 0, 0));
+                            }
+                            else
+                            {
+                                //有数据则使用数据周期；
+                                var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(dat.Days, dat.Hours, dat.Minutes, dat.Seconds));
+                            }
                         }
+                        {
+                            messageDict.TryAdd((byte)GateParameterCode.Token, token);
+                            string dat;
+                            var hasDat = ApplicationBuilder.TryGetServerList(out dat);
+                            if (hasDat)
+                                packet.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
+                            this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
+                            messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
+                        }
+                        GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
+                        Utility.Debug.LogInfo($"Register user: {userObj}");
                     }
+                    else
                     {
-                        messageDict.TryAdd((byte)GateParameterCode.Token, token);
-                        string dat;
-                        var hasDat = ApplicationBuilder.TryGetServerList(out dat);
-                        if (hasDat)
-                            packet.Messages.Add((byte)GateParameterCode.ServerInfo, dat);
-                        this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
-                        messageDict.TryAdd((byte)GateParameterCode.User,Utility.Json.ToJson( userObj));
+                        //账号存在
+                        this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemAlreadyExists;
                     }
-                    GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
-                    Utility.Debug.LogInfo($"Register user: {userObj}");
+                    GameManager.ReferencePoolManager.Despawn(nHCriteriaAccount);
                 }
                 else
                 {
-                    //账号存在
-                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemAlreadyExists;
+                    //业务数据无效
+                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                GameManager.ReferencePoolManager.Despawn(nHCriteriaAccount);
-            }
-            else
-            {
-                //业务数据无效
-                this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
-            }
-            return this.handlerPacket;
+                return this.handlerPacket;
+            });
         }
     }
 }

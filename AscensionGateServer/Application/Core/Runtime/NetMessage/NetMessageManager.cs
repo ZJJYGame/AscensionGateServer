@@ -75,10 +75,10 @@ namespace AscensionGateServer
                     var exist = handlerDict.TryGetValue(packet.OperationCode, out var handler);
                     if (exist)
                     {
-                        var mp = handler.Handle(packet);
+                        var mp = handler.HandleAsync(packet).Result;
                         if (mp != null)
                         {
-                            SendMessageAsync(netMsg, mp);
+                            SendMessageAsync(netMsg.Conv, mp);
                         }
                     }
                 }
@@ -100,7 +100,19 @@ namespace AscensionGateServer
                     GameManager.NetworkManager.SendNetworkMessage(msg);
                 }
             });
-
+        }
+        async void SendMessageAsync(long conv, MessagePacket packet)
+        {
+            await Task.Run(() =>
+            {
+                //加密为密文byte[]；
+                byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
+                if (packetBuffer != null)
+                {
+                    UdpNetMessage msg = UdpNetMessage.EncodeMessage(conv, GateOperationCode._MSG, packetBuffer);
+                    GameManager.NetworkManager.SendNetworkMessage(msg);
+                }
+            });
         }
     }
 }
