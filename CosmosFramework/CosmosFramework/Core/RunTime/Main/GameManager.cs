@@ -18,8 +18,8 @@ namespace Cosmos
         internal Action refreshHandler;
         internal Action terminationHandler;
         int moduleCount = 0;
-        static Dictionary<ModuleEnum, IModule> moduleDict;
-        internal static Dictionary<ModuleEnum, IModule> ModuleDict { get { return moduleDict; } }
+        static ConcurrentDictionary<ModuleEnum, IModule> moduleDict;
+        internal static ConcurrentDictionary<ModuleEnum, IModule> ModuleDict { get { return moduleDict; } }
         static ReferencePoolManager referencePoolManager;
         public static ReferencePoolManager ReferencePoolManager
         {
@@ -68,7 +68,7 @@ namespace Cosmos
         {
             if (moduleDict == null)
             {
-                moduleDict = new Dictionary<ModuleEnum, IModule>();
+                moduleDict = new ConcurrentDictionary<ModuleEnum, IModule>();
             }
         }
         public void OnPause()
@@ -107,7 +107,7 @@ namespace Cosmos
         {
             if (!HasModule(moduleEnum))
             {
-                moduleDict.Add(moduleEnum, module);
+                moduleDict.TryAdd(moduleEnum, module);
                 moduleCount++;
                 refreshHandler += module.OnRefresh;
                 terminationHandler += module.OnTermination;
@@ -124,7 +124,7 @@ namespace Cosmos
             {
                 var m = moduleDict[module];
                 refreshHandler -= m.OnRefresh;
-                moduleDict.Remove(module);
+                moduleDict.TryRemove(module,out _ );
                 moduleCount--;
                 try { terminationHandler -= m.OnTermination; }
                 catch { }
