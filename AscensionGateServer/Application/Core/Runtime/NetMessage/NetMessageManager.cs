@@ -75,11 +75,7 @@ namespace AscensionGateServer
                     var exist = handlerDict.TryGetValue(packet.OperationCode, out var handler);
                     if (exist)
                     {
-                        var mp = handler.HandleAsync(packet).Result;
-                        if (mp != null)
-                        {
-                            SendMessageAsync(netMsg.Conv, mp);
-                        }
+                        SendMessageAsync(netMsg.Conv, handler.HandleAsync(packet).Result);
                     }
                 }
                 catch (Exception e)
@@ -92,27 +88,44 @@ namespace AscensionGateServer
         {
             await Task.Run(() =>
             {
-                //加密为密文byte[]；
-                byte[] packetBuffer=Utility.MessagePack.ToByteArray(packet);
-                if (packetBuffer!=null)
+                try
                 {
-                    UdpNetMessage msg = UdpNetMessage.EncodeMessage(netMsg.Conv, netMsg.OperationCode, packetBuffer);
-                    GameManager.NetworkManager.SendNetworkMessage(msg);
+                    //加密为密文byte[]；
+                    byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
+                    if (packetBuffer != null)
+                    {
+                        UdpNetMessage msg = UdpNetMessage.EncodeMessage(netMsg.Conv, netMsg.OperationCode, packetBuffer);
+                        GameManager.NetworkManager.SendNetworkMessage(msg);
+                        GameManager.ReferencePoolManager.Despawn(packet);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Utility.Debug.LogError(e);
                 }
             });
         }
-        async void SendMessageAsync(long conv, MessagePacket packet)
+       public async void SendMessageAsync(long conv, MessagePacket packet)
         {
             await Task.Run(() =>
             {
-                //加密为密文byte[]；
-                byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
-                if (packetBuffer != null)
+                try
                 {
-                    UdpNetMessage msg = UdpNetMessage.EncodeMessage(conv, GateOperationCode._MSG, packetBuffer);
-                    GameManager.NetworkManager.SendNetworkMessage(msg);
+                    //加密为密文byte[]；
+                    byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
+                    if (packetBuffer != null)
+                    {
+                        UdpNetMessage msg = UdpNetMessage.EncodeMessage(conv, GateOperationCode._MSG, packetBuffer);
+                        GameManager.NetworkManager.SendNetworkMessage(msg);
+                        GameManager.ReferencePoolManager.Despawn(packet);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Utility.Debug.LogError(e);
                 }
             });
         }
     }
 }
+

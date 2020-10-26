@@ -18,10 +18,13 @@ namespace AscensionGateServer
     public class LoginHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Login;
-        MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Login);
         public async override Task<MessagePacket> HandleAsync(MessagePacket packet)
         {
             return await Task.Run(() => {
+
+                //MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Login);
+                MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
+                handlerPacket.OperationCode = (byte)GateOperationCode._Login;
                 var packetMsg = packet.Messages;
                 if (packetMsg == null)
                     return null;
@@ -40,8 +43,8 @@ namespace AscensionGateServer
                     if (!verified)
                     {
                         //验证失败则返回空
-                        this.handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
-                        return this.handlerPacket;
+                        handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
+                        return handlerPacket;
                     }
                     var token = JWTEncoder.EncodeToken(userInfoObj);
                     //获取对应键值的key
@@ -71,16 +74,16 @@ namespace AscensionGateServer
                         }
                     }
                     messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
-                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
+                    handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
                     Utility.Debug.LogInfo(userInfoObj.ToString());
                     GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                 }
                 else
                 {
                     //业务数据无效
-                    this.handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
+                    handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                return this.handlerPacket;
+                return handlerPacket;
             });
         
         }

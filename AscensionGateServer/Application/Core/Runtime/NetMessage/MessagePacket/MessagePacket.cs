@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AscensionGateServer
 {
     [MessagePackObject]
-    public class MessagePacket
+    public class MessagePacket:IReference
     {
         public object this[byte messageKey]
         {
@@ -53,6 +53,13 @@ namespace AscensionGateServer
         public void SetMessages(Dictionary<byte, object> messages)
         {
             this.Messages = messages;
+        }
+        public void Clear()
+        {
+            DebugMessage = null;
+            OperationCode = 0;
+            Messages = null;
+            ReturnCode = 0;
         }
     }
 }
