@@ -75,7 +75,8 @@ namespace AscensionGateServer
                     var exist = handlerDict.TryGetValue(packet.OperationCode, out var handler);
                     if (exist)
                     {
-                        SendMessageAsync(netMsg.Conv, handler.HandleAsync(packet).Result);
+                        //SendMessageAsync(netMsg.Conv, handler.HandleAsync(packet).Result);
+                        SendMessageAsync(netMsg.Conv, handler.HandleAsync(netMsg).Result);
                     }
                 }
                 catch (Exception e)
