@@ -85,7 +85,6 @@ namespace AscensionGateServer
                 }
                 return handlerPacket;
             });
-        
         }
     }
 }

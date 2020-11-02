@@ -72,11 +72,10 @@ namespace AscensionGateServer
                     MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
                     if (packet == null)
                         return;
-                    var exist = handlerDict.TryGetValue(packet.OperationCode, out var handler);
-                    if (exist)
+                    if (handlerDict.TryGetValue(packet.OperationCode, out var handler))
                     {
+                        handler.HandleAsync(netMsg.Conv, packet);
                         //SendMessageAsync(netMsg.Conv, handler.HandleAsync(packet).Result);
-                        SendMessageAsync(netMsg.Conv, handler.HandleAsync(netMsg).Result);
                     }
                 }
                 catch (Exception e)

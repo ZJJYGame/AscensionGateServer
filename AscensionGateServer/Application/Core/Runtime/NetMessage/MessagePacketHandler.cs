@@ -15,12 +15,10 @@ namespace AscensionGateServer
         /// <param name="packet">消息体</param>
         /// <returns></returns>
         public  abstract  Task<MessagePacket >HandleAsync (MessagePacket packet);
-        public virtual async Task<MessagePacket >HandleAsync (INetworkMessage netMsg)
+        public virtual async void HandleAsync (long conv,MessagePacket packet)
         {
-            MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
-            if (packet == null)
-                return null;
-            return await HandleAsync(packet);
+           var mp=  await HandleAsync(packet);
+            GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, mp);
         }
         /// <summary>
         /// 空虚函数；
