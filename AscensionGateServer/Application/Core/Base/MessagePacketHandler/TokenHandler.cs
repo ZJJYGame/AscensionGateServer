@@ -55,11 +55,11 @@ namespace AscensionGateServer
                     }
                     //反序列化为数据对象
                     var userInfoObj = Utility.Json.ToObject<UserInfo>(dataStr);
-
+                    Utility.Debug.LogInfo($"token 为数据对象 UserInfo:{userInfoObj}");
                     //组合键值
                     var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
                     //获取对应键值的key
-                    var tokenContext = RedisHelper.String.StringGetAsync(tokenKey).Result;
+                    var tokenContext =RedisHelper.String.StringGet(tokenKey);
                     if (string.IsNullOrEmpty(tokenContext))
                     {
                         handlerPacket.ReturnCode = (byte)GateReturnCode.Empty;
