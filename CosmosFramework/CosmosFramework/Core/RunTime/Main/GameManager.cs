@@ -16,10 +16,14 @@ namespace Cosmos
         /// 轮询更新委托
         /// </summary>
         internal Action refreshHandler;
-        internal Action terminationHandler;
+        internal event Action RefreshHandler
+        {
+            add { refreshHandler += value; }
+            remove { refreshHandler -= value; }
+        }
         int moduleCount = 0;
-        static ConcurrentDictionary<ModuleEnum, IModule> moduleDict;
-        internal static ConcurrentDictionary<ModuleEnum, IModule> ModuleDict { get { return moduleDict; } }
+        static ConcurrentDictionary<Type, IModule> moduleDict;
+        internal static ConcurrentDictionary<Type, IModule> ModuleDict { get { return moduleDict; } }
         static ReferencePoolManager referencePoolManager;
         public static ReferencePoolManager ReferencePoolManager
         {
@@ -68,7 +72,7 @@ namespace Cosmos
         {
             if (moduleDict == null)
             {
-                moduleDict = new ConcurrentDictionary<ModuleEnum, IModule>();
+                moduleDict = new ConcurrentDictionary<Type, IModule>();
             }
         }
         public void OnPause()
@@ -91,26 +95,17 @@ namespace Cosmos
         public override void Dispose()
         {
             base.Dispose();
-            terminationHandler?.Invoke();
-            terminationHandler = null;
             ModuleDict.Clear();
         }
         internal void ModuleInitialization(IModule module)
         {
             module.OnInitialization();
-            Instance.RegisterModule(module.ModuleEnum, module);
-        }
-        /// <summary>
-        /// 注册模块
-        /// </summary>
-        internal void RegisterModule(ModuleEnum moduleEnum, IModule module)
-        {
-            if (!HasModule(moduleEnum))
+            var type = module.ModuleType;
+            if (!HasModule(type))
             {
-                moduleDict.TryAdd(moduleEnum, module);
+                moduleDict.TryAdd(type, module);
                 moduleCount++;
-                refreshHandler += module.OnRefresh;
-                terminationHandler += module.OnTermination;
+                RefreshHandler += module.OnRefresh;
                 Utility.Debug.LogInfo($"Module :{module} is OnInitialization");
             }
             else
@@ -118,24 +113,22 @@ namespace Cosmos
                 Utility.Debug.LogError(new ArgumentException($"Module : {module} is already exist!"));
             }
         }
-        internal void DeregisterModule(ModuleEnum module)
+        internal void ModuleTermination(IModule module)
         {
-            if (HasModule(module))
+            var type = module.ModuleType;
+            if (HasModule(type))
             {
-                var m = moduleDict[module];
-                refreshHandler -= m.OnRefresh;
-                moduleDict.TryRemove(module,out _ );
+                module.OnTermination();
+                RefreshHandler -= module.OnRefresh;
+                moduleDict.TryRemove(type, out _);
                 moduleCount--;
-                try { terminationHandler -= m.OnTermination; }
-                catch { }
-                Utility.Debug.LogInfo($"Module :{module} is OnTermination", MessageColor.DARKBLUE);
             }
             else
                 Utility.Debug.LogError(new ArgumentException($"Module : {module} is not exist!"));
         }
-        internal bool HasModule(ModuleEnum module)
+        internal bool HasModule(Type type)
         {
-            return moduleDict.ContainsKey(module);
+            return moduleDict.ContainsKey(type);
         }
         #endregion
     }
