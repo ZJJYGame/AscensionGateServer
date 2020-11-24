@@ -10,7 +10,6 @@
         Network,
         Data,
         ReferencePool,
-        Polling,
-        FSM
+        Polling
     }
 }

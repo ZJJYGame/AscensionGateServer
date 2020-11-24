@@ -1,6 +1,5 @@
 ﻿using Cosmos.Network;
 using Cosmos.Polling;
-using Cosmos.FSM;
 using Cosmos.Reference;
 using System;
 using System.Collections.Concurrent;
@@ -58,19 +57,6 @@ namespace Cosmos
                     Instance.ModuleInitialization(pollingManager);
                 }
                 return pollingManager;
-            }
-        }
-        static FSMManager fsmManager;
-        public static FSMManager FSMManager
-        {
-            get
-            {
-                if (fsmManager == null)
-                {
-                    fsmManager = new FSMManager();
-                    Instance.ModuleInitialization(fsmManager);
-                }
-                return fsmManager;
             }
         }
         #endregion
@@ -136,9 +122,9 @@ namespace Cosmos
         {
             if (HasModule(module))
             {
-
-                moduleDict.TryRemove( module,out var m);
+                var m = moduleDict[module];
                 refreshHandler -= m.OnRefresh;
+                moduleDict.TryRemove(module,out _ );
                 moduleCount--;
                 try { terminationHandler -= m.OnTermination; }
                 catch { }
@@ -150,22 +136,6 @@ namespace Cosmos
         internal bool HasModule(ModuleEnum module)
         {
             return moduleDict.ContainsKey(module);
-        }
-         void InitModule()
-        {
-            var modules = Utility.Assembly.GetInstancesByAttribute<ModuleAttribute, IModule>();
-            for (int i = 0; i < modules.Length; i++)
-            {
-                ModuleInitialization(modules[i]);
-            }
-            PrepareModule();
-        }
-        void PrepareModule()
-        {
-            foreach (var module in moduleDict.Values)
-            {
-                module.OnPreparatory();
-            }
         }
         #endregion
     }

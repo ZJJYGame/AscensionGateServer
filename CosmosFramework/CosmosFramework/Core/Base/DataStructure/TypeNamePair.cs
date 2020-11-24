@@ -6,22 +6,22 @@ namespace Cosmos
     /// <summary>
     /// Type类型与名称组合
     /// </summary>
-    public struct TypeStringPair : IEquatable<TypeStringPair>
+    public struct TypeNamePair : IEquatable<TypeNamePair>
     {
         Type type;
-        string _string;
+        string name;
         public Type Type { get { return type; } }
-        public string String { get { return _string; } }
-        public TypeStringPair(Type type, string str)
+        public string Name { get { return name; } }
+        public TypeNamePair(Type type, string name)
         {
             this.type = type;
-            this._string = str;
+            this.name = name;
         }
-        public void SetValue(Type type, string str)
+        public void SetValue(Type type, string name)
         {
             Clear();
             this.type = type;
-            this._string = str;
+            this.name = name;
         }
         public void SetValue(Type type)
         {
@@ -31,35 +31,35 @@ namespace Cosmos
         public void Clear()
         {
             type = default;
-            _string = default;
+            name = default;
         }
-        public TypeStringPair(Type type) : this(type, string.Empty){}
-        public bool Equals(TypeStringPair other)
+        public TypeNamePair(Type type) : this(type, string.Empty){}
+        public bool Equals(TypeNamePair other)
         {
-            return type == other.type && _string == other._string;
+            return type == other.type && name == other.name;
         }
-        public static bool operator == (TypeStringPair a,TypeStringPair b)
+        public static bool operator == (TypeNamePair a,TypeNamePair b)
         {
             return a.Equals(b);
         }
-        public static bool operator !=(TypeStringPair a, TypeStringPair b)
+        public static bool operator !=(TypeNamePair a, TypeNamePair b)
         {
             return !(a == b);
         }
         public override bool Equals(object obj)
         {
-            return obj is TypeStringPair && Equals((TypeStringPair)obj);
+            return obj is TypeNamePair && Equals((TypeNamePair)obj);
         }
         public override int GetHashCode()
         {
-            return type.GetHashCode() ^ _string.GetHashCode();
+            return type.GetHashCode() ^ name.GetHashCode();
         }
         public override string ToString()
         {
             if (type == null)
                 throw new ArgumentNullException("TypeNamePair : Type is invalid");
             var typeName = type.FullName;
-            return string.IsNullOrEmpty(_string) ? typeName : Utility.Text.Format("{0}.{1}",typeName,_string);
+            return string.IsNullOrEmpty(name) ? typeName : Utility.Text.Format("{0}.{1}",typeName,name);
         }
     }
 }
