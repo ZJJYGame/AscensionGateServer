@@ -13,13 +13,27 @@ namespace Cosmos.Network
         public event Action<IRemotePeer> PeerConnectEvent
         {
             add { peerConnectHandler += value; }
-            remove{peerConnectHandler -= value; }
+            remove
+            {
+                try { peerConnectHandler -= value; }
+                catch (Exception e)
+                {
+                    Utility.Debug.LogError(e);
+                }
+            }
         }
         Action<IRemotePeer> peerDisconnectHandler;
         public event Action<IRemotePeer> PeerDisconnectEvent
         {
             add { peerDisconnectHandler += value; }
-            remove{peerDisconnectHandler -= value; }
+            remove
+            {
+                try { peerDisconnectHandler -= value; }
+                catch (Exception e)
+                {
+                    Utility.Debug.LogError(e);
+                }
+            }
         }
         public bool TryGetValue(long key, out IRemotePeer value)
         {

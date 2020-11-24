@@ -62,12 +62,12 @@ namespace AscensionGateServer
                             //更新过期时间；
                             if (!hasDat)//没数据则默认一周；
                             {
-                                var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0, 0, 0));
+                                var t = RedisHelper.String.StringSet(tokenKey, token, new TimeSpan(7, 0, 0, 0));
                             }
                             else
                             {
                                 //有数据则使用数据周期；
-                                var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(dat.Days, dat.Hours, dat.Minutes, dat.Seconds));
+                                var t = RedisHelper.String.StringSet(tokenKey, token, new TimeSpan(dat.Days, dat.Hours, dat.Minutes, dat.Seconds));
                             }
                         }
                         {
