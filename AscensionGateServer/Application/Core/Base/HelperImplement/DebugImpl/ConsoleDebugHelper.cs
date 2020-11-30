@@ -129,7 +129,7 @@ namespace AscensionGateServer
 #else
             StackTrace st = new StackTrace(new StackFrame(2, true));
             StackTrace st0 = new StackTrace(new StackFrame(3, true));
-            string str = $"{DateTime.Now.ToString()}[ - ] > INFO : {msg};\nStackTrace[ - ] ：\n {st}{st0}";
+            string str = $"{DateTime.Now.ToString()}[ - ] > INFO : {msg};\nStackTrace[ - ] ：\n{st}{st0}";
 #endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
@@ -141,7 +141,7 @@ namespace AscensionGateServer
 #else
             StackTrace st = new StackTrace(new StackFrame(2, true));
             StackTrace st0 = new StackTrace(new StackFrame(3, true));
-            string str = $"{DateTime.Now.ToString()}[ - ] > WARN : {msg};\nStackTrace[ - ] ：\n {st}{st0}";
+            string str = $"{DateTime.Now.ToString()}[ - ] > WARN : {msg};\nStackTrace[ - ] ：\n{st}{st0}";
 #endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
@@ -153,7 +153,7 @@ namespace AscensionGateServer
 #else
             StackTrace st = new StackTrace(new StackFrame(2, true));
             StackTrace st0 = new StackTrace(new StackFrame(3, true));
-            string str = $"{DateTime.Now.ToString()}[ - ] > FATAL : {msg};\nStackTrace[ - ] ：\n {st}{st0}";
+            string str = $"{DateTime.Now.ToString()}[ - ] > FATAL : {msg};\nStackTrace[ - ] ：\n{st}{st0}";
 #endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }

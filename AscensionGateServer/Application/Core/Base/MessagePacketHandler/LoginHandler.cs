@@ -20,7 +20,8 @@ namespace AscensionGateServer
         public override ushort OpCode { get; protected set; } = GateOperationCode._Login;
         public async override void HandleAsync(long conv, MessagePacket packet)
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 Utility.Debug.LogInfo($"LoginHandler Conv:{conv}尝试登陆");
                 MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Login;
@@ -74,7 +75,7 @@ namespace AscensionGateServer
                     }
                     messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
                     handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
-                    Utility.Debug.LogInfo(userInfoObj.ToString());
+                    Utility.Debug.LogInfo($"Conv{conv} : {userInfoObj}");
                     GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                 }
                 else
