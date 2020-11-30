@@ -15,9 +15,5 @@ namespace AscensionGateServer
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Logoff;
         MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Logoff);
-        public override  Task<MessagePacket>HandleAsync(MessagePacket packet)
-        {
-            return null;
-        }
     }
 }

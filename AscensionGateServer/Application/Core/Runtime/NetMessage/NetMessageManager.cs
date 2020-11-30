@@ -75,28 +75,6 @@ namespace AscensionGateServer
                     if (handlerDict.TryGetValue(packet.OperationCode, out var handler))
                     {
                         handler.HandleAsync(netMsg.Conv, packet);
-                        //SendMessageAsync(netMsg.Conv, handler.HandleAsync(packet).Result);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Utility.Debug.LogError(e);
-                }
-            });
-        }
-        async void SendMessageAsync(INetworkMessage netMsg, MessagePacket packet)
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    //加密为密文byte[]；
-                    byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
-                    if (packetBuffer != null)
-                    {
-                        UdpNetMessage msg = UdpNetMessage.EncodeMessage(netMsg.Conv, netMsg.OperationCode, packetBuffer);
-                        GameManager.NetworkManager.SendNetworkMessage(msg);
-                        GameManager.ReferencePoolManager.Despawn(packet);
                     }
                 }
                 catch (Exception e)
@@ -115,9 +93,9 @@ namespace AscensionGateServer
                     byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
                     if (packetBuffer != null)
                     {
+                        GameManager.ReferencePoolManager.Despawn(packet);
                         UdpNetMessage msg = UdpNetMessage.EncodeMessage(conv, GateOperationCode._MSG, packetBuffer);
                         GameManager.NetworkManager.SendNetworkMessage(msg);
-                        GameManager.ReferencePoolManager.Despawn(packet);
                     }
                 }
                 catch (Exception e)

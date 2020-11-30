@@ -18,16 +18,15 @@ namespace AscensionGateServer
     public class LoginHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Login;
-        public async override Task<MessagePacket> HandleAsync(MessagePacket packet)
+        public async override void HandleAsync(long conv, MessagePacket packet)
         {
-            return await Task.Run(() => {
-
-                //MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Login);
+            await Task.Run(() => {
+                Utility.Debug.LogInfo($"LoginHandler Conv:{conv}尝试登陆");
                 MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Login;
                 var packetMsg = packet.Messages;
                 if (packetMsg == null)
-                    return null;
+                    return;
                 Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
                 handlerPacket.Messages = messageDict;
                 messageDict.Clear();
@@ -36,6 +35,7 @@ namespace AscensionGateServer
                 if (result)
                 {
                     var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
+                    Utility.Debug.LogInfo($"LoginHandler Conv:{conv} UserInfo:{userInfoObj}");
                     NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
                     NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
                     var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
@@ -44,7 +44,6 @@ namespace AscensionGateServer
                     {
                         //验证失败则返回空
                         handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
-                        return handlerPacket;
                     }
                     var token = JWTEncoder.EncodeToken(userInfoObj);
                     //获取对应键值的key
@@ -55,13 +54,13 @@ namespace AscensionGateServer
                         //更新过期时间；
                         if (!hasDat)//没数据则默认一周；
                         {
-                            var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0, 0, 0));
+                            var t = RedisHelper.String.StringSet(tokenKey, token, new TimeSpan(7, 0, 0, 0));
                         }
                         else
                         {
                             //有数据则使用数据周期；
                             var srcDat = dat as TokenExpireData;
-                            var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(srcDat.Days, srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
+                            var t = RedisHelper.String.StringSet(tokenKey, token, new TimeSpan(srcDat.Days, srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
                         }
                     }
                     messageDict.TryAdd((byte)GateParameterCode.Token, token);
@@ -83,7 +82,8 @@ namespace AscensionGateServer
                     //业务数据无效
                     handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                return handlerPacket;
+                GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
+
             });
         }
     }

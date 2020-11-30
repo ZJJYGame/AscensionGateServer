@@ -147,7 +147,6 @@ namespace Cosmos
                                 refreshHandler -= tmpPeer.OnRefresh;
                                 IRemotePeer abortedPeer;
                                 GameManager.NetworkManager.TryRemove(netMsg.Conv, out abortedPeer);
-                                //UdpClientPeer abortedUdpPeer = abortedPeer as UdpClientPeer;
                                 peerAbortHandler?.Invoke(abortedPeer.Conv);
                                 NetworkPeerEventCore.Instance.Dispatch(InnerOpCode._Disconnect, tmpPeer);
                                 GameManager.ReferencePoolManager.Despawn(abortedPeer);

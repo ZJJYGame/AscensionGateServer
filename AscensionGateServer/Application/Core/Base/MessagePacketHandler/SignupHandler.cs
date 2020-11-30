@@ -22,16 +22,16 @@ namespace AscensionGateServer
     public class SignupHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Signup;
-        //MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Signup);
-        public async override Task<MessagePacket> HandleAsync(MessagePacket packet)
+        public async override void HandleAsync(long conv, MessagePacket packet)
         {
-            return await Task.Run(() =>
+             await Task.Run(() =>
             {
+                Utility.Debug.LogInfo($"SignupHandler Conv:{conv}尝试注册");
                 MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Signup;
                 var packetMsg = packet.Messages;
                 if (packetMsg == null)
-                    return null;
+                    return ;
                 Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
                 handlerPacket.Messages = messageDict;
                 messageDict.Clear();
@@ -40,6 +40,7 @@ namespace AscensionGateServer
                 if (result)
                 {
                     var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
+                    Utility.Debug.LogInfo($"SignupHandler Conv:{conv} UserInfo:{userInfoObj}");
                     NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
                     User userObj = new User() { Account = userInfoObj.Account, Password = userInfoObj.Password };
                     bool isExist = NHibernateQuerier.Verify<User>(nHCriteriaAccount);
@@ -62,12 +63,12 @@ namespace AscensionGateServer
                             //更新过期时间；
                             if (!hasDat)//没数据则默认一周；
                             {
-                                var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(7, 0, 0, 0));
+                                var t = RedisHelper.String.StringSet(tokenKey, token, new TimeSpan(7, 0, 0, 0));
                             }
                             else
                             {
                                 //有数据则使用数据周期；
-                                var t = RedisHelper.String.StringSetAsync(tokenKey, token, new TimeSpan(dat.Days, dat.Hours, dat.Minutes, dat.Seconds));
+                                var t = RedisHelper.String.StringSet(tokenKey, token, new TimeSpan(dat.Days, dat.Hours, dat.Minutes, dat.Seconds));
                             }
                         }
                         {
@@ -80,7 +81,7 @@ namespace AscensionGateServer
                             messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
                         }
                         GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
-                        Utility.Debug.LogInfo($"Register user: {userObj}");
+                        Utility.Debug.LogInfo($"Conv:{conv} Register user: {userObj}");
                     }
                     else
                     {
@@ -94,7 +95,7 @@ namespace AscensionGateServer
                     //业务数据无效
                     handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                return handlerPacket;
+                GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
             });
         }
     }

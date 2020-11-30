@@ -8,18 +8,14 @@ namespace AscensionGateServer
     public abstract class MessagePacketHandler:IBehaviour
     {
         public abstract ushort OpCode { get; protected set; }
+
         /// <summary>
         /// 处理消息；
         /// 此方法在外部执行时为异步；
         /// </summary>
+        /// <param name="conv">传入的会话Id</param>
         /// <param name="packet">消息体</param>
-        /// <returns></returns>
-        public  abstract  Task<MessagePacket >HandleAsync (MessagePacket packet);
-        public virtual async void HandleAsync (long conv,MessagePacket packet)
-        {
-           var mp=  await HandleAsync(packet);
-            GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, mp);
-        }
+        public virtual async void HandleAsync (long conv,MessagePacket packet){}
         /// <summary>
         /// 空虚函数；
         /// </summary>

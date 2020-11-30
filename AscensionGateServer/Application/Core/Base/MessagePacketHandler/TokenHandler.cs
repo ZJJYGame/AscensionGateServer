@@ -20,16 +20,17 @@ namespace AscensionGateServer
     public class TokenHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Token;
-        //MessagePacket handlerPacket = new MessagePacket((byte)GateOperationCode._Token);
-        public async override Task<MessagePacket> HandleAsync(MessagePacket packet)
+        public async override void HandleAsync(long conv, MessagePacket packet)
         {
-            return await Task.Run(() =>
+            await Task.Run(() =>
             {
+                Utility.Debug.LogInfo($"TokenHandler Conv:{conv}尝试Token");
+
                 MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Token;
                 var packetMsg = packet.Messages;
                 if (packetMsg == null)
-                    return null;
+                    return ;
                 Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
                 handlerPacket.Messages = messageDict;
                 messageDict.Clear();
@@ -44,22 +45,22 @@ namespace AscensionGateServer
                     }
                     catch (Exception)
                     {
-                        Utility.Debug.LogError("token 解码失败");
+                        Utility.Debug.LogError($"Conv:{conv} token 解码失败");
                     }
                     //解码token
                     if (string.IsNullOrEmpty(dataStr))
                     {
                         handlerPacket.ReturnCode = (short)GateReturnCode.Fail;
-                        Utility.Debug.LogWarning((GateReturnCode)handlerPacket.ReturnCode);
-                        return handlerPacket;
+                        Utility.Debug.LogWarning($"Conv:{conv}  {(GateReturnCode)handlerPacket.ReturnCode}");
+                        return;
                     }
                     //反序列化为数据对象
                     var userInfoObj = Utility.Json.ToObject<UserInfo>(dataStr);
-                    Utility.Debug.LogInfo($"token 为数据对象 UserInfo:{userInfoObj}");
+                    Utility.Debug.LogInfo($"TokenHandler Conv:{conv} UserInfo:{userInfoObj}");
                     //组合键值
                     var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPostfix;
                     //获取对应键值的key
-                    var tokenContext =RedisHelper.String.StringGet(tokenKey);
+                    var tokenContext = RedisHelper.String.StringGet(tokenKey);
                     if (string.IsNullOrEmpty(tokenContext))
                     {
                         handlerPacket.ReturnCode = (byte)GateReturnCode.Empty;
@@ -94,7 +95,7 @@ namespace AscensionGateServer
                             var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
                             messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
                             GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
-                            Utility.Debug.LogInfo($"Token decoded message success", userObj); ;
+                            Utility.Debug.LogInfo($"Conv:{conv} Token decoded message success {userObj}");
                         }
                         else
                         {
@@ -108,7 +109,7 @@ namespace AscensionGateServer
                     //业务数据无效
                     handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                return handlerPacket;
+                GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
             });
         }
     }
