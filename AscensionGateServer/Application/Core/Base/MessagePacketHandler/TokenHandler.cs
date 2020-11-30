@@ -57,7 +57,7 @@ namespace AscensionGateServer
                     var userInfoObj = Utility.Json.ToObject<UserInfo>(dataStr);
                     Utility.Debug.LogInfo($"token 为数据对象 UserInfo:{userInfoObj}");
                     //组合键值
-                    var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
+                    var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPostfix;
                     //获取对应键值的key
                     var tokenContext =RedisHelper.String.StringGet(tokenKey);
                     if (string.IsNullOrEmpty(tokenContext))

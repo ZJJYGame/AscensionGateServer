@@ -27,9 +27,9 @@ namespace AscensionGateServer
         public static readonly byte[] _KcpIV;
         #region Prefix
         /// <summary>
-        /// redis的key
+        /// redis的key后缀
         /// </summary>
-        public static readonly string _TokenPrefix = "_TOKEN";
+        public static readonly string _TokenPostfix = "_TOKEN";
         #endregion
         static readonly string srvCfgFileName = "GameServerSetData.json";
         static ApplicationBuilder()

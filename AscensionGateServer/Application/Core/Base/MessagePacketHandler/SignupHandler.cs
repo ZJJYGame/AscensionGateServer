@@ -55,7 +55,7 @@ namespace AscensionGateServer
                         }
                         var token = JWTEncoder.EncodeToken(userInfoObj);
                         //获取对应键值的key
-                        var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPrefix;
+                        var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPostfix;
                         {
                             TokenExpireData dat;
                             var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
