@@ -1,15 +1,9 @@
-﻿using System;
-using Cosmos;
-using Cosmos.Network;
+﻿using Cosmos;
 using System.Threading.Tasks;
-using System.IO;
 using System.Runtime.InteropServices;
-using Protocol;
-using System.Collections.Generic;
-using Lidgren.Network;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Reflection;
+
 using RedisService;
+using System.Threading;
 
 namespace AscensionGateServer
 {
@@ -35,9 +29,8 @@ namespace AscensionGateServer
             Utility.Debug.LogInfo("Server Start Running !");
             GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
             GameManager.InitCustomeModule(typeof(ServerEntry).Assembly);
-            Task.Run(GameManagerAgent.Instance.OnRefresh);
             RedisManager.Instance.OnInitialization();
-            while (true) { }
+            GameManagerAgent.Instance.Start();
         }
         static void RedisAssert()
         {

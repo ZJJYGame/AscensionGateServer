@@ -25,7 +25,6 @@ namespace AscensionGateServer
             await Task.Run(() =>
             {
                 Utility.Debug.LogInfo($"TokenHandler Conv:{conv}尝试Token");
-
                 MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Token;
                 var packetMsg = packet.Messages;

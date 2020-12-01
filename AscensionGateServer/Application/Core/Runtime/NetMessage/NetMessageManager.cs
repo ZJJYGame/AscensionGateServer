@@ -64,8 +64,6 @@ namespace AscensionGateServer
         }
         async void HandleMessageAsync(INetworkMessage netMsg)
         {
-            await Task.Run(() =>
-            {
                 try
                 {
                     //这里是解码成明文后进行反序列化得到packet数据；
@@ -81,7 +79,6 @@ namespace AscensionGateServer
                 {
                     Utility.Debug.LogError(e);
                 }
-            });
         }
        public async void SendMessageAsync(long conv, MessagePacket packet)
         {
