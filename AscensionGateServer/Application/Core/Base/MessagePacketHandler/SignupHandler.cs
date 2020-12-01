@@ -22,7 +22,7 @@ namespace AscensionGateServer
     public class SignupHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Signup;
-        public async override void HandleAsync(long conv, MessagePacket packet)
+        public async override Task HandleAsync(long conv, MessagePacket packet)
         {
              await Task.Run(() =>
             {

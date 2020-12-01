@@ -20,10 +20,13 @@ namespace AscensionGateServer
     public class NetMessageManager : Module<NetMessageManager>
     {
         INetMessageEncryptHelper netMsgEncryptHelper;
-        ConcurrentDictionary<ushort, MessagePacketHandler> handlerDict = new ConcurrentDictionary<ushort, MessagePacketHandler>();
+        ConcurrentDictionary<ushort, Queue<MessagePacketHandler>> handlerDict;
+        ConcurrentDictionary<ushort, Type> handlerTypeDict;
         public override void OnInitialization()
         {
             NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, HandleMessage);
+            handlerDict = new ConcurrentDictionary<ushort, Queue<MessagePacketHandler>>();
+            handlerTypeDict = new ConcurrentDictionary<ushort, Type>();
             InitHandler();
             InitHelper();
         }
@@ -42,7 +45,7 @@ namespace AscensionGateServer
             for (int i = 0; i < length; i++)
             {
                 handlers[i].OnInitialization();
-                handlerDict.TryAdd(handlers[i].OpCode, handlers[i]);
+                handlerTypeDict.TryAdd(handlers[i].OpCode, handlers[i].GetType());
             }
         }
         /// <summary>
@@ -51,27 +54,43 @@ namespace AscensionGateServer
         ///  处理者完成处理后，对消息进行发送；
         /// </summary>
         /// <param name="netMsg">数据</param>
-        void HandleMessage(INetworkMessage netMsg)
+         async void HandleMessage(INetworkMessage netMsg)
         {
-            HandleMessageAsync(netMsg);
-        }
-        async void HandleMessageAsync(INetworkMessage netMsg)
-        {
-                try
+            try
+            {
+                //这里是解码成明文后进行反序列化得到packet数据；
+                MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
+                if (packet == null)
+                    return;
+                if (handlerDict.TryGetValue(packet.OperationCode, out var handlerQueue))
                 {
-                    //这里是解码成明文后进行反序列化得到packet数据；
-                    MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
-                    if (packet == null)
-                        return;
-                    if (handlerDict.TryGetValue(packet.OperationCode, out var handler))
+                    var hasHandler= handlerQueue.TryDequeue(out var handler);
+                    if (!hasHandler)
                     {
-                        handler.HandleAsync(netMsg.Conv, packet);
+                        handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
+                         handler= Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
                     }
+                    await handler.HandleAsync(netMsg.Conv, packet);
+                    handlerQueue.Enqueue(handler);
                 }
-                catch (Exception e)
+                else
                 {
-                    Utility.Debug.LogError(e);
+                    handlerQueue = new Queue<MessagePacketHandler>();
+                    handlerDict.TryAdd(packet.OperationCode, handlerQueue);
+                    var hasHandler = handlerQueue.TryDequeue(out var handler);
+                    if (!hasHandler)
+                    {
+                        handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
+                        handler = Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
+                    }
+                    await handler.HandleAsync(netMsg.Conv, packet);
+                    handlerQueue.Enqueue(handler);
                 }
+            }
+            catch (Exception e)
+            {
+                Utility.Debug.LogError(e);
+            }
         }
        public async void SendMessageAsync(long conv, MessagePacket packet)
         {
