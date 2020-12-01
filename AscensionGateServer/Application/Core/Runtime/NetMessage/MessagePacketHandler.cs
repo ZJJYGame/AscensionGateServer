@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Cosmos;
 namespace AscensionGateServer
 {
-    public abstract class MessagePacketHandler:IBehaviour
+    public abstract class MessagePacketHandler:IBehaviour,IReference
     {
         public abstract ushort OpCode { get; protected set; }
-
+        public virtual void Clear(){}
         /// <summary>
         /// 处理消息；
         /// 此方法在外部执行时为异步；

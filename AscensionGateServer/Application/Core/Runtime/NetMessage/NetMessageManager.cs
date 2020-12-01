@@ -37,19 +37,12 @@ namespace AscensionGateServer
         /// </summary>
         void InitHandler()
         {
-            var handlerType = typeof(MessagePacketHandler);
-            Type[] types = Assembly.GetAssembly(handlerType).GetTypes();
-            for (int i = 0; i < types.Length; i++)
+            var handlers = Utility.Assembly.GetDerivedTypeInstances<MessagePacketHandler>();
+            var length = handlers.Length;
+            for (int i = 0; i < length; i++)
             {
-                if (handlerType.IsAssignableFrom(types[i]))
-                {
-                    if (types[i].IsClass && !types[i].IsAbstract)
-                    {
-                        var handler = Utility.Assembly.GetTypeInstance(types[i]) as MessagePacketHandler;
-                        handler.OnInitialization();
-                        handlerDict.TryAdd(handler.OpCode, handler);
-                    }
-                }
+                handlers[i].OnInitialization();
+                handlerDict.TryAdd(handlers[i].OpCode, handlers[i]);
             }
         }
         /// <summary>
