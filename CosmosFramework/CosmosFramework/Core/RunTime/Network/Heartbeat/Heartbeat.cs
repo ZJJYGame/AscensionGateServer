@@ -13,7 +13,7 @@ namespace Cosmos
         /// 秒级别；
         /// 1代表1秒；
         /// </summary>
-        public uint HeartbeatInterval { get; set; } = 8;
+        public uint HeartbeatInterval { get; set; } = 45;
         /// <summary>
         /// 秒级别；
         /// 上一次心跳时间；
