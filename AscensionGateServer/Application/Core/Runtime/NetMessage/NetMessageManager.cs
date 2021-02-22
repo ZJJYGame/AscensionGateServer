@@ -54,45 +54,49 @@ namespace AscensionGateServer
         ///  处理者完成处理后，对消息进行发送；
         /// </summary>
         /// <param name="netMsg">数据</param>
-         async void HandleMessage(INetworkMessage netMsg)
+        async void HandleMessage(INetworkMessage netMsg)
         {
-            try
+            await Task.Run(() =>
             {
-                //这里是解码成明文后进行反序列化得到packet数据；
-                MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
-                if (packet == null)
-                    return;
-                if (handlerDict.TryGetValue(packet.OperationCode, out var handlerQueue))
+                try
                 {
-                    var hasHandler= handlerQueue.TryDequeue(out var handler);
-                    if (!hasHandler)
+                    //这里是解码成明文后进行反序列化得到packet数据；
+                    MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
+                    if (packet == null)
+                        return;
+                    var hasHandlerQueue = handlerDict.TryGetValue(packet.OperationCode, out var handlerQueue);
+                    if (hasHandlerQueue)
                     {
-                        handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
-                         handler= Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
+                        var hasHandler = handlerQueue.TryDequeue(out var handler);
+                        if (!hasHandler)
+                        {
+                            handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
+                            handler = Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
+                        }
+                        handler.HandleAsync(netMsg.Conv, packet);
+                        handlerQueue.Enqueue(handler);
                     }
-                    await handler.HandleAsync(netMsg.Conv, packet);
-                    handlerQueue.Enqueue(handler);
+                    else
+                    {
+                        handlerQueue = new Queue<MessagePacketHandler>();
+                        handlerDict.TryAdd(packet.OperationCode, handlerQueue);
+                        var hasHandler = handlerQueue.TryDequeue(out var handler);
+                        if (!hasHandler)
+                        {
+                            handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
+                            handler = Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
+                        }
+                        handler.HandleAsync(netMsg.Conv, packet);
+                        handlerQueue.Enqueue(handler);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    handlerQueue = new Queue<MessagePacketHandler>();
-                    handlerDict.TryAdd(packet.OperationCode, handlerQueue);
-                    var hasHandler = handlerQueue.TryDequeue(out var handler);
-                    if (!hasHandler)
-                    {
-                        handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
-                        handler = Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
-                    }
-                    await handler.HandleAsync(netMsg.Conv, packet);
-                    handlerQueue.Enqueue(handler);
+                    Utility.Debug.LogError(e);
                 }
-            }
-            catch (Exception e)
-            {
-                Utility.Debug.LogError(e);
-            }
+            });
         }
-       public async void SendMessageAsync(long conv, MessagePacket packet)
+        public async void SendMessageAsync(long conv, MessagePacket packet)
         {
             await Task.Run(() =>
             {
@@ -102,9 +106,9 @@ namespace AscensionGateServer
                     byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
                     if (packetBuffer != null)
                     {
-                        GameManager.ReferencePoolManager.Despawn(packet);
                         UdpNetMessage msg = UdpNetMessage.EncodeMessage(conv, GateOperationCode._MSG, packetBuffer);
                         GameManager.NetworkManager.SendNetworkMessage(msg);
+                        GameManager.ReferencePoolManager.Despawn(packet);
                     }
                 }
                 catch (Exception e)

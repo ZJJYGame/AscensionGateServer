@@ -18,34 +18,35 @@ namespace AscensionGateServer
     public class LoginHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Login;
-        public async override Task HandleAsync(long conv, MessagePacket packet)
+        public async override void HandleAsync(long conv, MessagePacket packet)
         {
-            await Task.Run(() =>
+            Utility.Debug.LogInfo($"LoginHandler Conv:{conv}尝试登陆");
+            MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
+            handlerPacket.OperationCode = (byte)GateOperationCode._Login;
+            var packetMsg = packet.Messages;
+            if (packetMsg == null)
+                return;
+            Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
+            handlerPacket.Messages = messageDict;
+            messageDict.Clear();
+            object data;
+            var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
+            if (result)
             {
-                Utility.Debug.LogInfo($"LoginHandler Conv:{conv}尝试登陆");
-                MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
-                handlerPacket.OperationCode = (byte)GateOperationCode._Login;
-                var packetMsg = packet.Messages;
-                if (packetMsg == null)
-                    return;
-                Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
-                handlerPacket.Messages = messageDict;
-                messageDict.Clear();
-                object data;
-                var result = packetMsg.TryGetValue((byte)GateParameterCode.UserInfo, out data);
-                if (result)
+                var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
+                Utility.Debug.LogInfo($"LoginHandler Conv:{conv} UserInfo:{userInfoObj}");
+                NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
+                var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
+                var verified = (userObj != null);
+                if (!verified)
                 {
-                    var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
-                    Utility.Debug.LogInfo($"LoginHandler Conv:{conv} UserInfo:{userInfoObj}");
-                    NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
-                    NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
-                    var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
-                    var verified = (userObj != null);
-                    if (!verified)
-                    {
-                        //验证失败则返回空
-                        handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
-                    }
+                    //验证失败则返回空
+                    handlerPacket.ReturnCode = (byte)GateReturnCode.ItemNotFound;
+                    Utility.Debug.LogWarning($"LoginHandler Conv:{conv}登陆失败，账号无效！");
+                }
+                else
+                {
                     var token = JWTEncoder.EncodeToken(userInfoObj);
                     //获取对应键值的key
                     var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPostfix;
@@ -78,14 +79,13 @@ namespace AscensionGateServer
                     Utility.Debug.LogInfo($"Conv{conv} : {userInfoObj}");
                     GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                 }
-                else
-                {
-                    //业务数据无效
-                    handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
-                }
-                GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
-
-            });
+            }
+            else
+            {
+                //业务数据无效
+                handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
+            }
+            GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
         }
     }
 }

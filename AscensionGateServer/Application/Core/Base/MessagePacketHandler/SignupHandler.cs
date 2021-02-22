@@ -22,10 +22,8 @@ namespace AscensionGateServer
     public class SignupHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Signup;
-        public async override Task HandleAsync(long conv, MessagePacket packet)
+        public  override void HandleAsync(long conv, MessagePacket packet)
         {
-             await Task.Run(() =>
-            {
                 Utility.Debug.LogInfo($"SignupHandler Conv:{conv}尝试注册");
                 MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Signup;
@@ -96,7 +94,6 @@ namespace AscensionGateServer
                     handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
                 GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
-            });
         }
     }
 }

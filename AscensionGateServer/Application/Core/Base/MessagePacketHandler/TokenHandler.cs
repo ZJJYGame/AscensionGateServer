@@ -20,10 +20,8 @@ namespace AscensionGateServer
     public class TokenHandler : MessagePacketHandler
     {
         public override ushort OpCode { get; protected set; } = GateOperationCode._Token;
-        public async override Task HandleAsync(long conv, MessagePacket packet)
+        public async override void HandleAsync(long conv, MessagePacket packet)
         {
-            await Task.Run(() =>
-            {
                 Utility.Debug.LogInfo($"TokenHandler Conv:{conv}尝试Token");
                 MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Token;
@@ -109,7 +107,6 @@ namespace AscensionGateServer
                     handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
                 GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
-            });
         }
     }
 }

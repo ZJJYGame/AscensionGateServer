@@ -15,7 +15,7 @@ namespace AscensionGateServer
         /// </summary>
         /// <param name="conv">传入的会话Id</param>
         /// <param name="packet">消息体</param>
-        public virtual async Task HandleAsync (long conv,MessagePacket packet){}
+        public virtual  void HandleAsync (long conv,MessagePacket packet){}
         /// <summary>
         /// 空虚函数；
         /// </summary>
