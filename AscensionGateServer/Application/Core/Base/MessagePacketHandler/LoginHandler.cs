@@ -21,7 +21,7 @@ namespace AscensionGateServer
         public async override void HandleAsync(long conv, MessagePacket packet)
         {
             Utility.Debug.LogInfo($"LoginHandler Conv:{conv}尝试登陆");
-            MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
+            MessagePacket handlerPacket = CosmosEntry.ReferencePoolManager.Spawn<MessagePacket>();
             handlerPacket.OperationCode = (byte)GateOperationCode._Login;
             var packetMsg = packet.Messages;
             if (packetMsg == null)
@@ -35,8 +35,8 @@ namespace AscensionGateServer
             {
                 var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
                 Utility.Debug.LogInfo($"LoginHandler Conv:{conv} UserInfo:{userInfoObj}");
-                NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
-                NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
+                NHCriteria nHCriteriaAccount = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                NHCriteria nHCriteriaPassword = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
                 var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
                 var verified = (userObj != null);
                 if (!verified)
@@ -52,7 +52,7 @@ namespace AscensionGateServer
                     var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPostfix;
                     {
                         TokenExpireData dat;
-                        var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
+                        var hasDat =  ServerEntry.DataManager.TryGetValue(out dat);
                         //更新过期时间；
                         if (!hasDat)//没数据则默认一周；
                         {
@@ -77,7 +77,7 @@ namespace AscensionGateServer
                     messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
                     handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
                     Utility.Debug.LogInfo($"Conv{conv} : {userInfoObj}");
-                    GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
+                    CosmosEntry.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                 }
             }
             else
@@ -85,7 +85,7 @@ namespace AscensionGateServer
                 //业务数据无效
                 handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
             }
-            GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
+            //ServerEntry.NetMessageManager.SendMessageAsync(conv, handlerPacket);
         }
     }
 }

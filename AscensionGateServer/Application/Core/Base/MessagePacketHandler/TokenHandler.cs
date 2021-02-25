@@ -23,7 +23,7 @@ namespace AscensionGateServer
         public async override void HandleAsync(long conv, MessagePacket packet)
         {
                 Utility.Debug.LogInfo($"TokenHandler Conv:{conv}尝试Token");
-                MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
+                MessagePacket handlerPacket = CosmosEntry.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Token;
                 var packetMsg = packet.Messages;
                 if (packetMsg == null)
@@ -76,7 +76,7 @@ namespace AscensionGateServer
                             }
                             {
                                 TokenExpireData dat;
-                                var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
+                                var hasDat = ServerEntry. DataManager.TryGetValue(out dat);
                                 //更新过期时间；
                                 if (!hasDat)//没数据则默认一周；
                                     RedisHelper.KeyExpire(data.ToString(), new TimeSpan(7, 0, 0, 0));
@@ -87,11 +87,11 @@ namespace AscensionGateServer
                                     RedisHelper.KeyExpire(data.ToString(), new TimeSpan(srcDat.Days, srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
                                 }
                             }
-                            NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
-                            NHCriteria nHCriteriaPassword = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
+                            NHCriteria nHCriteriaAccount = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                            NHCriteria nHCriteriaPassword = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
                             var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
                             messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
-                            GameManager.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
+                        CosmosEntry.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
                             Utility.Debug.LogInfo($"Conv:{conv} Token decoded message success {userObj}");
                         }
                         else
@@ -106,7 +106,7 @@ namespace AscensionGateServer
                     //业务数据无效
                     handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
+                //ServerEntry.NetMessageManager.SendMessageAsync(conv, handlerPacket);
         }
     }
 }

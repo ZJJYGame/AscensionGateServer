@@ -4,31 +4,36 @@ using System.Collections.Concurrent;
 using System;
 namespace Cosmos.Reference
 {
-    public sealed class ReferencePoolManager : Module<ReferencePoolManager>
+    [Module]
+    public sealed class ReferencePoolManager :Module,IReferencePoolManager
     {
         #region Properties
         /// <summary>
         /// 单个引用池上线
         /// </summary>
-        internal static readonly short _ReferencePoolCapcity = 5000;
-        ConcurrentDictionary<Type, ReferenceSpawnPool> referenceDict = new ConcurrentDictionary<Type, ReferenceSpawnPool>();
+        internal static readonly short _ReferencePoolCapcity= 5000;
+        ConcurrentDictionary<Type, ReferenceSpawnPool> referenceDict ;
         #endregion
 
         #region Methods
-        public int GetPoolCount<T>()
+        public override void OnInitialization()
+        {
+            referenceDict = new ConcurrentDictionary<Type, ReferenceSpawnPool>();
+        }
+        public int GetPoolCount<T>() 
             where T : class, IReference, new()
         {
             try
             {
-                return referenceDict[typeof(T)].ReferenceCount;
+                    return referenceDict[typeof(T)].ReferenceCount;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new ArgumentNullException("Type :" + typeof(T).FullName + " not register in reference pool");
             }
         }
-        public T Spawn<T>()
-            where T : class, IReference, new()
+        public T Spawn<T>() 
+            where T: class, IReference ,new()
         {
             Type type = typeof(T);
             if (!referenceDict.ContainsKey(type))
@@ -73,7 +78,7 @@ namespace Cosmos.Reference
             }
         }
         public void Despawns<T>(List<T> refers)
-            where T : class, IReference, new()
+            where T:class ,IReference,new()
         {
             Type type = typeof(T);
             if (!referenceDict.ContainsKey(type))
@@ -89,7 +94,7 @@ namespace Cosmos.Reference
             refers.Clear();
         }
         public void Despawns<T>(T[] refers)
-            where T : class, IReference, new()
+            where T :class,IReference,new()
         {
             Type type = typeof(T);
             if (!referenceDict.ContainsKey(type))

@@ -4,8 +4,8 @@ using System.Text;
 using Cosmos;
 namespace AscensionGateServer
 {
-    [CustomeModule]
-    public class DataManager : Module<DataManager>, ISimpleKeyValue<Type, object>
+    [Module]
+    public class DataManager : Module,IDataManager
     {
         /// <summary>
         /// 间隔秒；

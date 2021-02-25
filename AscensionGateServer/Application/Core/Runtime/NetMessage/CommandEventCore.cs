@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Protocol;
 namespace AscensionGateServer
 {
-    public class MessagePacketEventCore:ConcurrentEventCore<byte,MessagePacket,MessagePacketEventCore>
+    public class CommandEventCore:ConcurrentStandardEventCore<byte,long,OperationData,CommandEventCore>
     {
     }
 }

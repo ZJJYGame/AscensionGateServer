@@ -17,7 +17,7 @@ namespace AscensionGateServer
     //3、Success部分，返回值带有验证成功后的Token、服务器列表；
     //=========================================
     /// <summary>
-    /// 注册
+    /// 注册;
     /// </summary>
     public class SignupHandler : MessagePacketHandler
     {
@@ -25,7 +25,7 @@ namespace AscensionGateServer
         public  override void HandleAsync(long conv, MessagePacket packet)
         {
                 Utility.Debug.LogInfo($"SignupHandler Conv:{conv}尝试注册");
-                MessagePacket handlerPacket = GameManager.ReferencePoolManager.Spawn<MessagePacket>();
+                MessagePacket handlerPacket = CosmosEntry.ReferencePoolManager.Spawn<MessagePacket>();
                 handlerPacket.OperationCode = (byte)GateOperationCode._Signup;
                 var packetMsg = packet.Messages;
                 if (packetMsg == null)
@@ -39,13 +39,13 @@ namespace AscensionGateServer
                 {
                     var userInfoObj = Utility.Json.ToObject<UserInfo>(Convert.ToString(data));
                     Utility.Debug.LogInfo($"SignupHandler Conv:{conv} UserInfo:{userInfoObj}");
-                    NHCriteria nHCriteriaAccount = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                    NHCriteria nHCriteriaAccount = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
                     User userObj = new User() { Account = userInfoObj.Account, Password = userInfoObj.Password };
                     bool isExist = NHibernateQuerier.Verify<User>(nHCriteriaAccount);
                     if (!isExist)
                     {
                         userObj = NHibernateQuerier.Insert(userObj);
-                        NHCriteria nHCriteriaUUID = GameManager.ReferencePoolManager.Spawn<NHCriteria>().SetValue("UUID", userObj.UUID);
+                        NHCriteria nHCriteriaUUID = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("UUID", userObj.UUID);
                         bool userRoleExist = NHibernateQuerier.Verify<UserRole>(nHCriteriaUUID);
                         if (!userRoleExist)
                         {
@@ -57,7 +57,7 @@ namespace AscensionGateServer
                         var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPostfix;
                         {
                             TokenExpireData dat;
-                            var hasDat = GameManager.CustomeModule<DataManager>().TryGetValue(out dat);
+                            var hasDat = ServerEntry.DataManager.TryGetValue(out dat);
                             //更新过期时间；
                             if (!hasDat)//没数据则默认一周；
                             {
@@ -78,7 +78,7 @@ namespace AscensionGateServer
                             handlerPacket.ReturnCode = (byte)GateReturnCode.Success;
                             messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
                         }
-                        GameManager.ReferencePoolManager.Despawn(nHCriteriaUUID);
+                    CosmosEntry.ReferencePoolManager.Despawn(nHCriteriaUUID);
                         Utility.Debug.LogInfo($"Conv:{conv} Register user: {userObj}");
                     }
                     else
@@ -86,14 +86,14 @@ namespace AscensionGateServer
                         //账号存在
                         handlerPacket.ReturnCode = (byte)GateReturnCode.ItemAlreadyExists;
                     }
-                    GameManager.ReferencePoolManager.Despawn(nHCriteriaAccount);
+                CosmosEntry.ReferencePoolManager.Despawn(nHCriteriaAccount);
                 }
                 else
                 {
                     //业务数据无效
                     handlerPacket.ReturnCode = (byte)GateReturnCode.InvalidOperationParameter;
                 }
-                GameManager.CustomeModule<NetMessageManager>().SendMessageAsync(conv, handlerPacket);
+            //ServerEntry.NetMessageManager.SendMessageAsync(conv, handlerPacket);
         }
     }
 }

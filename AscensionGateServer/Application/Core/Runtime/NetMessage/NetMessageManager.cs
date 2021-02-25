@@ -16,19 +16,40 @@ namespace AscensionGateServer
     //3、消息处理者完成消息处理后，则返回处理完成的消息；
     //4、发送处理好的消息；
     //==========================================
-    [CustomeModule]
-    public class NetMessageManager : Module<NetMessageManager>
+    [Module]
+    public class NetMessageManager :Cosmos. Module,INetMessageManager
     {
         INetMessageEncryptHelper netMsgEncryptHelper;
         ConcurrentDictionary<ushort, Queue<MessagePacketHandler>> handlerDict;
         ConcurrentDictionary<ushort, Type> handlerTypeDict;
         public override void OnInitialization()
         {
-            NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, HandleMessage);
+            //NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, HandleMessage);
+            NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, ProcessCommandMessage);
             handlerDict = new ConcurrentDictionary<ushort, Queue<MessagePacketHandler>>();
             handlerTypeDict = new ConcurrentDictionary<ushort, Type>();
             InitHandler();
             InitHelper();
+        }
+        public async void SendMessageAsync(long conv, OperationData packet)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    //加密为密文byte[]；
+                    byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
+                    if (packetBuffer != null)
+                    {
+                        UdpNetMessage msg = UdpNetMessage.EncodeMessage(conv, GateOperationCode._MSG, packetBuffer);
+                        CosmosEntry.NetworkManager.SendNetworkMessage(msg);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Utility.Debug.LogError(e);
+                }
+            });
         }
         void InitHelper()
         {
@@ -96,26 +117,27 @@ namespace AscensionGateServer
                 }
             });
         }
-        public async void SendMessageAsync(long conv, MessagePacket packet)
+        /// <summary>
+        /// 处理指令消息；
+        /// </summary>
+        /// <param name="netMsg">数据</param>
+        async void ProcessCommandMessage(INetworkMessage netMsg)
         {
-            await Task.Run(() =>
-            {
+            //await Task.Run(() =>
+            //{
                 try
                 {
-                    //加密为密文byte[]；
-                    byte[] packetBuffer = Utility.MessagePack.ToByteArray(packet);
-                    if (packetBuffer != null)
-                    {
-                        UdpNetMessage msg = UdpNetMessage.EncodeMessage(conv, GateOperationCode._MSG, packetBuffer);
-                        GameManager.NetworkManager.SendNetworkMessage(msg);
-                        GameManager.ReferencePoolManager.Despawn(packet);
-                    }
+                    //这里是解码成明文后进行反序列化得到OperationData数据；
+                    var packet = Utility.MessagePack.ToObject<OperationData>(netMsg.ServiceMsg);
+                    if (packet == null)
+                        return;
+                    CommandEventCore.Instance.Dispatch((byte)packet.OperationCode,netMsg.Conv, packet);
                 }
                 catch (Exception e)
                 {
                     Utility.Debug.LogError(e);
                 }
-            });
+            //});
         }
     }
 }

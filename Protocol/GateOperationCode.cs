@@ -9,10 +9,14 @@ namespace Protocol
     public class GateOperationCode
     {
         #region MessagePack Opcode
-        public static readonly ushort _Login = 1;
-        public static readonly ushort _Logoff =2 ;
-        public static readonly ushort _Signup = 3;
-        public static readonly ushort _Token= 243;
+        public const ushort _Login = 1;
+        public const ushort _Logoff =2 ;
+        public const ushort _Signup = 3;
+        /// <summary>
+        /// 当前账号下的所有角色信息；
+        /// </summary>
+        public const ushort _AccountRoles = 4;
+        public const ushort _Token= 243;
         #endregion
 
 

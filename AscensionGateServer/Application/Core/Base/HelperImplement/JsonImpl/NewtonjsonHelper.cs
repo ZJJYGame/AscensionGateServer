@@ -11,6 +11,10 @@ namespace AscensionGateServer
         {
             return JsonConvert.SerializeObject(obj);
         }
+        public string ToJson(object obj, bool prettyPrint)
+        {
+            return JsonConvert.SerializeObject(obj,Formatting.Indented);
+        }
         public T ToObject<T>(string json)
         {
             return JsonConvert.DeserializeObject<T>(json);

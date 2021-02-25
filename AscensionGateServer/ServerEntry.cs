@@ -27,13 +27,12 @@ namespace AscensionGateServer
             Utility.Json.SetHelper(new NewtonjsonHelper());
             Utility.MessagePack.SetHelper(new ImplMessagePackHelper());
             Utility.Debug.LogInfo("Server Start Running !");
-            GameManager.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
-            GameManager.InitCustomeModule(typeof(ServerEntry).Assembly);
+            CosmosEntry.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
+            CosmosEntry.LaunchModules();
             RedisManager.Instance.OnInitialization();
-            GameManagerAgent.Instance.Start();
+            CosmosEntry.Run();
         }
-        static void RedisAssert()
-        {
-        }
+     public static IDataManager DataManager { get { return GameManager.GetModule<IDataManager>(); } }
+     public static INetMessageManager  NetMessageManager{ get { return GameManager.GetModule<INetMessageManager>(); } }
     }
 }
