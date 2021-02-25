@@ -12,10 +12,6 @@ namespace Protocol
         public const ushort _Login = 1;
         public const ushort _Logoff =2 ;
         public const ushort _Signup = 3;
-        /// <summary>
-        /// 当前账号下的所有角色信息；
-        /// </summary>
-        public const ushort _AccountRoles = 4;
         public const ushort _Token= 243;
         #endregion
 
