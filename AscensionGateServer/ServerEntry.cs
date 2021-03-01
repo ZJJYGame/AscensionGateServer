@@ -23,12 +23,10 @@ namespace AscensionGateServer
         static void Main(string[] args)
         {
             SetConsoleCtrlHandler(newDelegate, true);
-            Utility.Debug.SetHelper(new ConsoleDebugHelper());
-            Utility.Json.SetHelper(new NewtonjsonHelper());
-            Utility.MessagePack.SetHelper(new ImplMessagePackHelper());
+            CosmosEntry.LaunchHelpers();
             Utility.Debug.LogInfo("Server Start Running !");
-            CosmosEntry.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
             CosmosEntry.LaunchModules();
+            CosmosEntry.NetworkManager.Connect(ip, port, System.Net.Sockets.ProtocolType.Udp);
             RedisManager.Instance.OnInitialization();
             CosmosEntry.Run();
         }

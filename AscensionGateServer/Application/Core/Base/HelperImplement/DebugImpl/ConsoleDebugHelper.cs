@@ -6,6 +6,7 @@ using System.Text;
 using Cosmos;
 namespace AscensionGateServer
 {
+    [ImplementProvider]
     public class ConsoleDebugHelper : IDebugHelper
     {
         readonly string logFullPath;

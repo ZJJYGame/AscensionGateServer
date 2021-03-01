@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 namespace AscensionGateServer
 {
+    [ImplementProvider]
     public class NewtonjsonHelper : IJsonHelper
     {
         public string ToJson(object obj)

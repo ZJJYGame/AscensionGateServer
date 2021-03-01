@@ -17,14 +17,13 @@ namespace AscensionGateServer
     //4、发送处理好的消息；
     //==========================================
     [Module]
-    public class NetMessageManager :Cosmos. Module,INetMessageManager
+    public class NetMessageManager : Cosmos.Module, INetMessageManager
     {
         INetMessageEncryptHelper netMsgEncryptHelper;
         ConcurrentDictionary<ushort, Queue<MessagePacketHandler>> handlerDict;
         ConcurrentDictionary<ushort, Type> handlerTypeDict;
         public override void OnInitialization()
         {
-            //NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, HandleMessage);
             NetworkMsgEventCore.Instance.AddEventListener(GateOperationCode._MSG, ProcessCommandMessage);
             handlerDict = new ConcurrentDictionary<ushort, Queue<MessagePacketHandler>>();
             handlerTypeDict = new ConcurrentDictionary<ushort, Type>();
@@ -70,74 +69,24 @@ namespace AscensionGateServer
             }
         }
         /// <summary>
-        ///  处理从系统通讯通道 （_MSG ）接收到的消息，并解包成MessagePack对象；
-        ///  解包完成后，派发消息到具体的消息处理者；
-        ///  处理者完成处理后，对消息进行发送；
-        /// </summary>
-        /// <param name="netMsg">数据</param>
-        async void HandleMessage(INetworkMessage netMsg)
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    //这里是解码成明文后进行反序列化得到packet数据；
-                    MessagePacket packet = Utility.MessagePack.ToObject<MessagePacket>(netMsg.ServiceMsg);
-                    if (packet == null)
-                        return;
-                    var hasHandlerQueue = handlerDict.TryGetValue(packet.OperationCode, out var handlerQueue);
-                    if (hasHandlerQueue)
-                    {
-                        var hasHandler = handlerQueue.TryDequeue(out var handler);
-                        if (!hasHandler)
-                        {
-                            handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
-                            handler = Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
-                        }
-                        handler.HandleAsync(netMsg.Conv, packet);
-                        handlerQueue.Enqueue(handler);
-                    }
-                    else
-                    {
-                        handlerQueue = new Queue<MessagePacketHandler>();
-                        handlerDict.TryAdd(packet.OperationCode, handlerQueue);
-                        var hasHandler = handlerQueue.TryDequeue(out var handler);
-                        if (!hasHandler)
-                        {
-                            handlerTypeDict.TryGetValue(packet.OperationCode, out var handleType);
-                            handler = Utility.Assembly.GetTypeInstance(handleType) as MessagePacketHandler;
-                        }
-                        handler.HandleAsync(netMsg.Conv, packet);
-                        handlerQueue.Enqueue(handler);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Utility.Debug.LogError(e);
-                }
-            });
-        }
-        /// <summary>
+        ///  处理从系统通讯通道 （_MSG ）接收到的消息，并解包成OperationData对象；
         /// 处理指令消息；
         /// </summary>
         /// <param name="netMsg">数据</param>
         async void ProcessCommandMessage(INetworkMessage netMsg)
         {
-            //await Task.Run(() =>
-            //{
-                try
-                {
-                    //这里是解码成明文后进行反序列化得到OperationData数据；
-                    var packet = Utility.MessagePack.ToObject<OperationData>(netMsg.ServiceMsg);
-                    if (packet == null)
-                        return;
-                    CommandEventCore.Instance.Dispatch((byte)packet.OperationCode,netMsg.Conv, packet);
-                }
-                catch (Exception e)
-                {
-                    Utility.Debug.LogError(e);
-                }
-            //});
+            try
+            {
+                //这里是解码成明文后进行反序列化得到OperationData数据；
+                var packet = Utility.MessagePack.ToObject<OperationData>(netMsg.ServiceMsg);
+                if (packet == null)
+                    return;
+                CommandEventCore.Instance.Dispatch((byte)packet.OperationCode, netMsg.Conv, packet);
+            }
+            catch (Exception e)
+            {
+                Utility.Debug.LogError(e);
+            }
         }
     }
 }
