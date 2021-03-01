@@ -118,8 +118,10 @@ namespace AscensionGateServer
 
         void Error( string msg)
         {
-            StackTrace st = new StackTrace(new StackFrame(4, true));
-            string str = $"{DateTime.Now.ToString()}[ - ] > ERROR : {msg};\nStackTrace[ - ] ：{st}";
+            StackTrace st = new StackTrace(new StackFrame(2, true));
+            StackTrace st0 = new StackTrace(new StackFrame(3, true));
+            StackTrace st1 = new StackTrace(new StackFrame(4, true));
+            string str = $"{DateTime.Now.ToString()}[ - ] > ERROR : {msg};\nStackTrace[ - ] ：{st}{st0}{st1}";
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
         void Info(string msg)
@@ -130,7 +132,8 @@ namespace AscensionGateServer
 #else
             StackTrace st = new StackTrace(new StackFrame(2, true));
             StackTrace st0 = new StackTrace(new StackFrame(3, true));
-            string str = $"{DateTime.Now.ToString()}[ - ] > INFO : {msg};\nStackTrace[ - ] ：\n{st}{st0}";
+            StackTrace st1 = new StackTrace(new StackFrame(4, true));
+            string str = $"{DateTime.Now.ToString()}[ - ] > INFO : {msg};\nStackTrace[ - ] ：\n{st}{st0}{st1}";
 #endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
@@ -142,7 +145,8 @@ namespace AscensionGateServer
 #else
             StackTrace st = new StackTrace(new StackFrame(2, true));
             StackTrace st0 = new StackTrace(new StackFrame(3, true));
-            string str = $"{DateTime.Now.ToString()}[ - ] > WARN : {msg};\nStackTrace[ - ] ：\n{st}{st0}";
+            StackTrace st1 = new StackTrace(new StackFrame(4, true));
+            string str = $"{DateTime.Now.ToString()}[ - ] > WARN : {msg};\nStackTrace[ - ] ：\n{st}{st0}{st1}";
 #endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }
@@ -154,7 +158,8 @@ namespace AscensionGateServer
 #else
             StackTrace st = new StackTrace(new StackFrame(2, true));
             StackTrace st0 = new StackTrace(new StackFrame(3, true));
-            string str = $"{DateTime.Now.ToString()}[ - ] > FATAL : {msg};\nStackTrace[ - ] ：\n{st}{st0}";
+            StackTrace st1 = new StackTrace(new StackFrame(4, true));
+            string str = $"{DateTime.Now.ToString()}[ - ] > FATAL : {msg};\nStackTrace[ - ] ：\n{st}{st0}{st1}";
 #endif
             Utility.IO.AppendWriteTextFile(logFullPath, logFileName, str);
         }

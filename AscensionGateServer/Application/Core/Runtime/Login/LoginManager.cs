@@ -26,8 +26,8 @@ namespace AscensionGateServer
         //=========================================
         void ProcessLoginC2S(long conv, OperationData packet)
         {
-            Utility.Debug.LogInfo($"LoginHandler Conv:{conv}尝试登陆");
-            var opData = new OperationData() { OperationCode = GateOperationCode._Login };
+            Utility.Debug.LogInfo($"LoginHandler Conv:{conv}尝试账号密码登陆");
+            var opData = new OperationData() { OperationCode = GateOperationCode._Login};
             var packetMsg = Utility.Json.ToObject<Dictionary<byte,object>> (Convert.ToString( packet.DataMessage));
             if (packetMsg == null)
                 return;
@@ -101,11 +101,9 @@ namespace AscensionGateServer
         //=========================================
         void ProcessTokenC2S(long conv,OperationData packet)
         {
-            Utility.Debug.LogInfo($"TokenHandler Conv:{conv}尝试Token");
+            Utility.Debug.LogInfo($"TokenHandler Conv:{conv}尝试Token验证");
             var opData = new OperationData() { OperationCode = GateOperationCode._Token};
-            opData.OperationCode = (byte)GateOperationCode._Token;
             var packetMsg = Utility.Json.ToObject<Dictionary<byte, object>>(Convert.ToString(packet.DataMessage));
-            //var packetMsg = (Dictionary<byte,object>)packet.DataMessage;
             if (packetMsg == null)
                 return;
             Dictionary<byte, object> messageDict = new Dictionary<byte, object>();
@@ -113,25 +111,30 @@ namespace AscensionGateServer
             var result = packetMsg.TryGetValue((byte)GateParameterCode.Token, out data);
             if (result)
             {
-                string dataStr = null;
+                string userDataStr = null;
                 try
                 {
-                    dataStr = JWTEncoder.DecodeToken(data.ToString());
+                    userDataStr = JWTEncoder.DecodeToken(data.ToString());
                 }
                 catch (Exception)
                 {
                     Utility.Debug.LogError($"Conv:{conv} token 解码失败");
                 }
                 //解码token
-                if (string.IsNullOrEmpty(dataStr))
+                if (string.IsNullOrEmpty(userDataStr))
                 {
                     opData.ReturnCode = (short)GateReturnCode.Fail;
                     Utility.Debug.LogWarning($"Conv:{conv}  {(GateReturnCode)opData.ReturnCode}");
                     return;
                 }
                 //反序列化为数据对象
-                var userInfoObj = Utility.Json.ToObject<UserInfo>(dataStr);
+                var userInfoObj = Utility.Json.ToObject<UserInfo>(userDataStr);
                 Utility.Debug.LogInfo($"TokenHandler Conv:{conv} UserInfo:{userInfoObj}");
+
+                NHCriteria nHCriteriaAccount = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
+                NHCriteria nHCriteriaPassword = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
+                var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
+
                 //组合键值
                 var tokenKey = userInfoObj.Account + ApplicationBuilder._TokenPostfix;
                 //获取对应键值的key
@@ -144,38 +147,46 @@ namespace AscensionGateServer
                 {
                     if (data.ToString() == tokenContext)
                     {
-                        opData.ReturnCode = (byte)GateReturnCode.Success;
+                        if(userObj != null)
                         {
-                            //添加服务器列表数据;
-                            string dat;
-                            var hasDat = ApplicationBuilder.TryGetServerList(out dat);
-                            if (hasDat)
-                                messageDict.TryAdd((byte)GateParameterCode.ServerInfo, dat);
-                        }
-                        {
-                            TokenExpireData dat;
-                            var hasDat = ServerEntry.DataManager.TryGetValue(out dat);
-                            //更新过期时间；
-                            if (!hasDat)//没数据则默认一周；
-                                RedisHelper.KeyExpire(data.ToString(), new TimeSpan(7, 0, 0, 0));
-                            else
+                            opData.ReturnCode = (byte)GateReturnCode.Success;
                             {
-                                //有数据则使用数据周期；
-                                var srcDat = dat as TokenExpireData;
-                                RedisHelper.KeyExpire(data.ToString(), new TimeSpan(srcDat.Days, srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
+                                //添加服务器列表数据;
+                                string dat;
+                                var hasDat = ApplicationBuilder.TryGetServerList(out dat);
+                                if (hasDat)
+                                {
+                                    messageDict.TryAdd((byte)GateParameterCode.ServerInfo, dat);
+                                    messageDict.TryAdd((byte)GateParameterCode.UserInfo, userDataStr);
+                                }
                             }
+                            {
+                                TokenExpireData dat;
+                                var hasDat = ServerEntry.DataManager.TryGetValue(out dat);
+                                //更新过期时间；
+                                if (!hasDat)//没数据则默认一周；
+                                    RedisHelper.KeyExpire(data.ToString(), new TimeSpan(7, 0, 0, 0));
+                                else
+                                {
+                                    //有数据则使用数据周期；
+                                    var srcDat = dat as TokenExpireData;
+                                    RedisHelper.KeyExpire(data.ToString(), new TimeSpan(srcDat.Days, srcDat.Hours, srcDat.Minutes, srcDat.Seconds));
+                                }
+                            }
+                            messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
+                            CosmosEntry.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
+                            Utility.Debug.LogInfo($"Conv:{conv} Token decoded message success {userObj}");
                         }
-                        NHCriteria nHCriteriaAccount = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Account", userInfoObj.Account);
-                        NHCriteria nHCriteriaPassword = CosmosEntry.ReferencePoolManager.Spawn<NHCriteria>().SetValue("Password", userInfoObj.Password);
-                        var userObj = NHibernateQuerier.CriteriaSelect<User>(nHCriteriaAccount, nHCriteriaPassword);
-                        messageDict.TryAdd((byte)GateParameterCode.User, Utility.Json.ToJson(userObj));
-                        CosmosEntry.ReferencePoolManager.Despawns(nHCriteriaAccount, nHCriteriaPassword);
-                        Utility.Debug.LogInfo($"Conv:{conv} Token decoded message success {userObj}");
+                        else
+                        {
+                            //验证失败，返回fail
+                            opData.ReturnCode = (byte)GateReturnCode.Fail;
+                        }
                     }
                     else
                     {
                         //验证失败，返回fail
-                        opData.ReturnCode = (byte)GateReturnCode.ItemNotFound;
+                        opData.ReturnCode = (byte)GateReturnCode.Fail;
                     }
                 }
             }
